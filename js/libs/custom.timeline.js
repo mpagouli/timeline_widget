@@ -15,14 +15,26 @@
             size: undefined,
             days: undefined,
             label: undefined,
-            index: undefined
+            index: undefined,
+            elementClicked: function(){},
+            elementBind: function(){}
         },
 
         //initialization 
         _create: function () {
-            this.element.addClass('timeline_element').bind('click',{elem:this},function(e){
-                e.data.elem.element.trigger('time_element_clicked', [e.data.elem.options]);
+            var bindInfo, eData;
+            this.element.addClass('timeline_element').bind('click',{widget:this},function(e){
+                //e.data.widget.element.trigger('elementClicked', [e.data.widget.options]);
+                //e.data.widget._trigger('elementClicked', null, e.data.widget.options);
+                e.data.widget.options.elementClicked(e.data.widget.options);
             });
+
+            bindInfo = this.options.elementBind(this.options);
+            if(bindInfo!==undefined && bindInfo.e!==undefined && bindInfo.cb !== undefined){
+                eData = (bindInfo.data === undefined)? {elem:this.options} : $.extend({},this.options,bindInfo.data);
+                this.element.bind(bindInfo.e, bindInfo.cb);
+            }
+            
         }
 
     });
@@ -33,13 +45,16 @@
 
         //default options
         options: {
-            row_elems: []
+            row_elems: [],
+            legendClicked: function(){}
         },
 
         //initialization 
         _create: function () {
-            this.element.bind('click',{elem:this},function(e){ //alert(e.data.elem.options.row_elems.length);
-                e.data.elem.element.trigger('time_legend_clicked', [e.data.elem.options.row_elems]);
+            this.element.bind('click',{widget:this},function(e){
+                //e.data.widget.element.trigger('time_legend_clicked', [e.data.widget.options.row_elems]);
+                //e.data.widget._trigger('legendClicked', null, e.data.widget.options.row_elems);
+                e.data.widget.options.legendClicked(e.data.widget.options.row_elems);
             });
         }
         
@@ -68,7 +83,10 @@
                 number: 1000,
                 unit: 'px'
             },
-            elements: []
+            elements: [],
+            elementStyle: function(){},
+            elementClicked: function(){},
+            elementBind: function(){}
         },
 
         //initialization 
@@ -124,9 +142,16 @@
         },
 
         _renderElement: function (time_element) { 
-            var options, newElement;
+            var options, newElement, style_class;
             newElement = $("<div class='timeline_element'></div>").appendTo('.working_set');
             newElement.attr('id', 'elem' + time_element.id);
+            
+            //this._trigger('elementStyle', null, time_element);
+            style_class = this.options.elementStyle(time_element);
+            newElement.addClass('timeline_element_default');
+            if(style_class !== undefined) { 
+                newElement.addClass(style_class); 
+            }
             newElement.css({
                 //'position': 'absolute',
                 'margin-top': (this.options.row_height.number / 4) + this.options.row_height.unit,
@@ -136,6 +161,9 @@
                 'left': this.options.unit_width.number * time_element.start + 'px',
                 'top': time_element.index * this.options.row_height.number + 'px'
             });
+
+            time_element.elementClicked = this.options.elementClicked;
+            time_element.elementBind = this.options.elementBind;
             newElement._timeline_element(time_element);
         }
     });
@@ -287,7 +315,7 @@
             },
             min_width: '660px',
             min_height: '320px',
-            label_css: {
+            h_label_css: {
                 'font-family': 'Verdana',
                 'font-size': '10px',
                 'font-style': 'normal',
@@ -301,8 +329,14 @@
                 'font-style': 'normal',
                 'font-weight': 'bold',
                 'padding': '0px 0px',
-                'text-align': 'center'
-            }
+                'text-align': 'center',
+                'border-top': '1px solid'
+            },
+            elementStyle : function(){},
+            elementClicked: function(){},
+            legendClicked: function(){},
+            legendStyleText: function(){},
+            elementBind: function(){}
         },
 
         _setSize: function (typ, val) {
@@ -661,7 +695,7 @@
         //initialization
         _create: function () {
 
-            var timeline_widths, timeline_heights, width_unit, height_unit, headersCont, headers, header, legendsCont, baseHeader, legends, wrapper, workSetCont, workSet, ws_boundaries, newAround;
+            var timeline_widths, timeline_heights, width_unit, height_unit, headersCont, headers, header, legendsCont, baseHeader, legends, wrapper, widget, triggerelementStyle, workSetCont, workSet, ws_boundaries, newAround;
             if (this.options.headers.length === 0) {
                 this._initializeHeaders();
             }
@@ -747,7 +781,12 @@
                 'overflow-x': 'hidden'
             });
 
-            workSet = $("<div></div>").appendTo('.ws_container')._working_set({
+
+            //widget = this;
+            //triggerelementStyle = function(event, data){ widget._trigger('elementStyle', null, data); 
+            //triggerelementStyle = this.options.elementStyle;
+
+            workSet = $("<div></div>").appendTo('.ws_container')._working_set({ 
                 unit_width: this.options.unit_width,
                 row_height: this.options.row_height,
                 width: {
@@ -757,7 +796,10 @@
                 height: {
                     number: timeline_heights.ws,
                     unit: this.options.row_height.unit
-                }
+                },
+                elementStyle: this.options.elementStyle,
+                elementClicked: this.options.elementClicked,
+                elementBind: this.options.elementBind
             });
 
             $(".headers_container").position({
@@ -824,7 +866,14 @@
             /*$(".ws_container").bind('time_element_clicked', function(event, elem){
                 //alert(elem.label);
             });*/
+            $(".ws_container").bind('xixixi', function (event,time_elem) { 
+            alert('ddd'); 
+            //this.options.beforeElemDrawCb(el)
+            }
+            );
 
+            //this.options.beforeElemDrawCb();
+            //this._trigger('complete', null, { value: 100 });
         },
 
 
@@ -844,7 +893,7 @@
         },
 
         _setLegends: function (ws_height) {
-            var rows, elems, css, j, row_elems, elems_label, paddingLeft, paddingRight, paddingTop, paddingBottom;
+            var rows, elems, css, j, row_elems, elems_label, paddingLeft, paddingRight, paddingTop, paddingBottom, style_class, style_text;
             rows = Math.round(ws_height / this.options.row_height.number);
             elems = this.options.ws_elements;
             css = this.options.legend_css;
@@ -852,27 +901,47 @@
             for (j = 0; j < rows; j += 1) {
 
                 row_elems = this._getRowElements(elems, j);
+
+                //this._trigger('legendStyleText',null, row_elems);
+                style_text = this.options.legendStyleText(row_elems);
+                elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
+                style_class = "timeline_legend_default";
+                if(style_text !== undefined){
+                    if(style_text.text !== undefined){
+                        elems_label = style_text.text;
+                    }
+                    if(style_text.style !== undefined){
+                        style_class = style_text.style;
+                    }
+                }
+
                 if (row_elems.length === 0) {
                     $('<div></div>').appendTo(".timeline_legend").css({
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
-                        'left': '0px',
-                        'border-top': '1px solid'
-                    }).css(css);
+                        'left': '0px'
+                    })
+                    .css(css)
+                    .text(elems_label)
+                    .addClass(style_class);
                 } else {
                     /*var elems_label = "";
                     for(var k=0; k<row_elems.length; k += 1){ 
                         elems_label += row_elems[k].label +" " ;
                     }*/
-                    elems_label = row_elems.length + ((row_elems.length === 1) ? " element" : " elements");
+                    
                     $('<div></div>').appendTo(".timeline_legend").css({
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
                         'left': '0px',
                         'border-top': '1px solid'
-                    }).css(css)
+                    })
+                    .css(css)
+                    .addClass(style_class)
                     .text(elems_label)
-                    ._timeline_legend({ row_elems: $.extend([], row_elems) });
+                    ._timeline_legend({ row_elems: $.extend([], row_elems), legendClicked: this.options.legendClicked });
 
                 }
+
+
                 paddingLeft = this._getSizeHash($('.timeline_legend div').css('padding-left')).number;
                 paddingRight = this._getSizeHash($('.timeline_legend div').css('padding-right')).number;
                 paddingTop = this._getSizeHash($('.timeline_legend div').css('padding-top')).number;
@@ -937,7 +1006,7 @@
             labels_count = Math.round(ws_width / header_width);
             now = header.start;
             appendTo = (i === 0) ? '.timeline_header' : '#header_layer' + i;
-            css = $.extend({}, this.options.label_css, header.label_css);
+            css = $.extend({}, this.options.h_label_css, header.label_css);
             label_text = (header.type === 'date') ? now.format(header.type_format) : ((header.type === 'month') ? now.format("mmmm") : ((header.type === 'year') ? now.format("yyyy") : header.type_format + " " + now));
 
             for (j = 0; j < labels_count; j += 1) {

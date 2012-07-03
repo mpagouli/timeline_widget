@@ -125,6 +125,7 @@
                             scroll: false,
                             disabled: true
                         });
+                        followerChild.removeClass('ui-state-disabled');
                         followerChild.css({
                             'left': parseFloat(contChild.position().left)
                         });
@@ -137,7 +138,7 @@
                             scroll: false,
                             disabled: true
                         });
-
+                        followerChild.removeClass('ui-state-disabled');
                         followerChild.css({
                             'top': parseFloat(contChild.position().top)
                         });
@@ -149,6 +150,7 @@
                             scroll: false,
                             disabled: true
                         });
+                        followerChild.removeClass('ui-state-disabled');
                         followerChild.css({
                             'top': parseFloat(contChild.position().top),
                             'left': parseFloat(contChild.position().left)

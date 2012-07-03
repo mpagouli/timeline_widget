@@ -4,3 +4,20 @@ body{
 	margin-left: 400px;
 	margin-right: 400px;
 }
+
+.cancelled{
+	background:red;
+}
+.confirmed{
+	background:green;
+}
+.pending{
+	background:yellow;
+}
+.departed{
+	background:gray;
+}
+
+.leg{
+	background:lightblue;
+}

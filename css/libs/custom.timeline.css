@@ -24,13 +24,15 @@ div.timeline_wrapper{
 
 div.timeline_element{
  position:absolute;
- opacity:0.7;
- background: green;
- border-radius : 4px;
+}
+
+.timeline_element_default{
+    opacity:0.7;
+    background: green;
+    border-radius : 4px;
 }
 
 div.timeline_legend{ 
-    background-color: white;
     /*background-image: -webkit-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));
     background-image: -moz-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));
     background-image: -ms-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));
@@ -41,6 +43,10 @@ div.timeline_legend{
     top:0px;
     left:0px;
    
+}
+
+.timeline_legend_default{
+    'background': 'white'
 }
 
 .timeline_header div, .timeline_legend div {
@@ -66,15 +72,3 @@ div.timeline_legend{
     top:0px;
     left:0px;
 }
-
- /* tooltip styling. by default the element to be styled is .tooltip  */
-  .tooltip {
-    display:none;
-    background:transparent url(images/black_arrow.png);
-    font-size:12px;
-    height:70px;
-    width:160px;
-    padding:25px;
-    color:#eee;
-  }
-  ​

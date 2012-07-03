@@ -5,51 +5,25 @@ $(document).ready(function(){
         'border': '2px solid'
     }).appendTo("body");
 
-    bar.timeline({
-        width: '660px',
-        height: '320px',
-        elements: [{
-            id: 1,
-            //start: 1.5,
-            startDate: new Date(2012, 5, 26),
-            days: 7,
-            index: 1,
-            label: "Elem A"
-        }, {
-            id: 2,
-            //start: 5.3, 
-            startDate: new Date(2012, 5, 28),
-            days: 4,
-            index: 2,
-            label: "Elem B"
-        }, {
-            id: 3,
-            //start: 5.3, 
-            startDate: new Date(2012, 5, 20),
-            days: 17,
-            index: 3,
-            label: "Elem C"
-        }, {
-            id: 4,
-            //start: 5.3, 
-            startDate: new Date(2012, 5, 2),
-            endDate: new Date(2012, 5, 22),
-            //days: 21,
-            index: 4,
-            label: "Elem D"
-        }, {
-            id: 5,
-            //start: 5.3, 
-            startDate: new Date(2012, 5, 1),
-            days: 10,
-            index: 5,
-            label: "Elem E"
-        }]
-    });
 
+    var defineElemColor = function(time_elem){
+        //alert(time_elem.id);
+        var style_class = 'confirmed';
+        if(time_elem.id === 4 ) { style_class = 'departed'; }
+        if(time_elem.id === 2 ) { style_class = 'cancelled'; }
+        if(time_elem.id === 1 ) { style_class = 'departed'; }
+        if(time_elem.id === 5 ) { style_class = 'departed'; }
+        if(time_elem.id === 6 ) { style_class = 'pending'; }
+        /*time_elem.css_class = 'confirmed';
+        if(time_elem.id === 4 ) { time_elem.css_class = 'departed'; }
+        if(time_elem.id === 2 ) { time_elem.css_class = 'cancelled'; }
+        if(time_elem.id === 1 ) { time_elem.css_class = 'departed'; }
+        if(time_elem.id === 5 ) { time_elem.css_class = 'departed'; }
+        if(time_elem.id === 6 ) { time_elem.css_class = 'pending'; } */
+        return style_class;
+    };
 
-    
-    bar.bind('time_element_clicked', function(event, elem){
+    var showElemInfo = function(elem){
         var dialog = $('<div></div>')
         .addClass("ui-widget ui-widget-content ui-corner-all")
         .css({ 'width': '100px', 'height': '200px', 'padding': '10px' })
@@ -59,12 +33,11 @@ $(document).ready(function(){
             title: elem.label,
             position: "center"
         });
-        dialog.dialog('open');
-        
-    });
+        dialog.dialog('open'); 
+    };
 
-    bar.bind('time_legend_clicked', function(event, elems){
-        var elems_str = elems[0].label;
+    var showLegendInfo = function(elems){
+       var elems_str = elems[0].label;
         for(var i=1; i<elems.length; i++){
             if(i === 1) { elems_str += ', ';}
             elems_str += elems[i].label
@@ -79,7 +52,95 @@ $(document).ready(function(){
             position: "center"
         });
         dialog.dialog('open');
+    };
+
+    var defineLegend = function(elems){
+       if(elems.length!==0){
+            return {style: 'leg'};
+       }
+       return {text:'No elems'};
+    };
+
+    var elementDBL = function(elem){
+
+        var showElemInfo = function(event,ui){
+            var dialog = $('<div></div>')
+            .addClass("ui-widget ui-widget-content ui-corner-all")
+            .css({ 'width': '100px', 'height': '200px', 'padding': '10px' })
+            .html('<p>Start Date: '+elem.startDate.format('d/m/yyyy')+'</br>End Date: '+ elem.endDate.format('d/m/yyyy') +'</p>')
+            .dialog({
+                autoOpen: false,
+                title: elem.label,
+                position: "center"
+            });
+            dialog.dialog('open'); 
+        };
+
+      return {
+        e: 'dblclick',
+        data: { elem: elem },
+        cb: showElemInfo
+      };
+    };
+
+    bar.timeline({
+        width: '660px',
+        height: '320px',
+        elementStyle: defineElemColor,
+        //legendStyleText: defineLegend,
+        elementClicked: showElemInfo,
+        legendClicked: showLegendInfo,
+        //elementBind: elementDBL,
+        elements: [{
+            id: 1,
+            //start: 1.5,
+            startDate: new Date(2012, 5, 26),
+            days: 7,
+            //index: 1,
+            label: "Elem A"
+        }, {
+            id: 2,
+            //start: 5.3, 
+            startDate: new Date(2012, 5, 28),
+            days: 4,
+            //index: 2,
+            label: "Elem B"
+        }, {
+            id: 3,
+            //start: 5.3, 
+            startDate: new Date(2012, 5, 20),
+            days: 17,
+            //index: 3,
+            label: "Elem C"
+        }, {
+            id: 4,
+            //start: 5.3, 
+            startDate: new Date(2012, 5, 2),
+            endDate: new Date(2012, 5, 22),
+            //days: 21,
+            //index: 4,
+            label: "Elem D"
+        }, {
+            id: 5,
+            //start: 5.3, 
+            startDate: new Date(2012, 5, 1),
+            days: 10,
+            //index: 5,
+            label: "Elem E"
+        }, {
+            id: 6,
+            //start: 5.3, 
+            startDate: new Date(2012, 6, 10),
+            days: 5,
+            //index: 5,
+            label: "Elem F"
+        }]
     });
+
+    //var bb = bar.data( "timeline" );
+    //alert(bb.options.unit_width.number);
+
+    //bar.bind('timelinetime_element_drawn', function(ev, el) { alert('dasdasdasdasdasd'); } );
 
     $('#inc').bind('click', {el:bar}, function(e) {
         var unitW = e.data.el.data("timeline").options.unit_width;
