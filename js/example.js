@@ -2,7 +2,7 @@ $(document).ready(function(){
 	
     var bar = $("<div></div>").css({
         'overflow': 'visible',
-        'border': '2px solid'
+        'border': '1px solid'
     }).appendTo("body");
 
 
@@ -61,6 +61,24 @@ $(document).ready(function(){
        return {text:'No elems'};
     };
 
+    var defineHeaderStyle = function(dat){ //alert(dat)
+       if(dat.getDate() === new Date().getDate()){
+            return {style: 'leg'};
+       }
+       return {text: 'one very big'+dat.format('dddd d mmmm yyyy')};
+    };
+
+    var setImgStyleAltSize = function(w,h){
+        var ww,hh;
+        ww = (w.number-20) + w.unit;
+        hh = (h.number-10) + h.unit;
+       return { src:'images/clock.png', title:'Time Flies', width:ww, height:hh, style_class: 'myimg' };
+    };
+
+    var defineWSStyle = function(uw,rh,w,h){
+       return 'myws';
+    };
+
     var elementDBL = function(elem){
 
         var showElemInfo = function(event,ui){
@@ -84,13 +102,17 @@ $(document).ready(function(){
     };
 
     bar.timeline({
-        width: '660px',
+        width: '680px',
         height: '320px',
-        elementStyle: defineElemColor,
+        //elementStyle: defineElemColor,
         //legendStyleText: defineLegend,
         elementClicked: showElemInfo,
+        elementDBLClicked: showElemInfo,
         legendClicked: showLegendInfo,
+        //headerStyleText: defineHeaderStyle,
         //elementBind: elementDBL,
+        //timelineImg: setImgStyleAltSize,
+        //wsStyle: defineWSStyle,
         elements: [{
             id: 1,
             //start: 1.5,

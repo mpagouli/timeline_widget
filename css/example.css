@@ -7,17 +7,39 @@ body{
 
 .cancelled{
 	background:red;
+	border-radius : 7px;
 }
 .confirmed{
 	background:green;
+	border-radius : 7px;
 }
 .pending{
 	background:yellow;
+	border-radius : 7px;
 }
 .departed{
 	background:gray;
+	border-radius : 7px;
 }
 
 .leg{
 	background:lightblue;
+}
+
+.myimg{
+	/*border:2px dotted;*/
+	padding-top:5px;
+}
+
+.myimgp{
+	text-align:center;
+}
+
+.myws{
+    background: transparent;
+    opacity:0.8;
+    background-image: -webkit-linear-gradient(0, lightblue 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -moz-linear-gradient(0, lightblue 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -ms-linear-gradient(0, lightblue 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -o-linear-gradient(0, lightblue 50%, rgba(230, 230, 230, .5) 50%);
 }

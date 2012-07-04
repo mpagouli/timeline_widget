@@ -1,21 +1,14 @@
 div.working_set{
     position:relative;
     overflow:hidden;
-    background-color: transparent;
-    opacity:0.8;
-    background-image: -webkit-linear-gradient(0, lightgray 50%, rgba(230, 230, 230, .5) 50%);
-    background-image: -moz-linear-gradient(0, lightgray 50%, rgba(230, 230, 230, .5) 50%);
-    background-image: -ms-linear-gradient(0, lightgray 50%, rgba(230, 230, 230, .5) 50%);
-    background-image: -o-linear-gradient(0, lightgray 50%, rgba(230, 230, 230, .5) 50%);
 }
 
 div.viewport{
   overflow: hidden;
-  /*position: relative;*/
 }
 
 div.timeline_wrapper{ 
-    background-color: transparent;
+    background: transparent;
     /*background-image: -webkit-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
     background-image: -moz-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
     background-image: -ms-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
@@ -26,27 +19,11 @@ div.timeline_element{
  position:absolute;
 }
 
-.timeline_element_default{
-    opacity:0.7;
-    background: green;
-    border-radius : 4px;
-}
-
 div.timeline_legend{ 
-    /*background-image: -webkit-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));
-    background-image: -moz-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));
-    background-image: -ms-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));
-    background-image: -o-linear-gradient(transparent 99%, rgba(0, 0, 0, .5) 1%, rgba(0, 0, 0, .9));*/
    overflow:hidden; 
-   /*float:left;*/
     position:absolute;
     top:0px;
-    left:0px;
-   
-}
-
-.timeline_legend_default{
-    'background': 'white'
+    left:0px;  
 }
 
 .timeline_header div, .timeline_legend div {
@@ -60,15 +37,70 @@ div.timeline_legend{
 }
 
 .timeline_header{ 
-    background-color: white;
-    /*background-image: -webkit-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
-    background-image: -moz-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
-    background-image: -ms-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
-    background-image: -o-linear-gradient(0, transparent 99%, rgba(0, 0, 0, .9) 1%);
-    border-top:1px solid black;
-    float:left;*/
     overflow:hidden;
     position:absolute;
     top:0px;
     left:0px;
+}
+
+.timeline_image_container{
+    float:left;
+}
+
+
+
+
+/*****************************THEMES**********************************/
+/**DEFAULT FALCON BOUQUET ********************************************/
+
+.working_set_theme, .working_set_falconbouquet{
+    background: transparent;
+    opacity:0.8;
+    background-image: -webkit-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -moz-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -ms-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -o-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
+}
+
+.timeline_element_theme, .timeline_element_falconbouquet{
+    opacity:0.7;
+    background: #028482;
+    border-radius : 4px;
+}
+
+.timeline_legend_theme, .timeline_legend_falconbouquet{
+    text-shadow: 1px 1px 0px #84596b;
+    color: white;
+    border-top: 1px solid #84596b;
+    background: #84596B; /*fallback for non-CSS3 browsers*/
+    background-image: linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*future CSS3 browsers*/
+    background-image: -o-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*opera 11.10+*/
+    background-image: -moz-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*gecko*/
+    background-image: -webkit-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*new webkit*/
+    background-image: -ms-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*IE10*/
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #84596b),color-stop(0.51, #B58AA5)); /*old webkit*/
+}
+
+.timeline_header_theme, .timeline_header_falconbouquet{
+    text-shadow: 1px 1px 0px #84596b;
+    color: white;
+    border-right: 1px solid #84596b;
+    background: #84596B; /*fallback for non-CSS3 browsers*/
+    background-image: linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*future CSS3 browsers*/
+    background-image: -o-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*opera 11.10+*/
+    background-image: -moz-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*gecko*/
+    background-image: -webkit-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*new webkit*/
+    background-image: -ms-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*IE10*/
+    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #84596b),color-stop(0.51, #B58AA5)); /*old webkit*/
+}
+
+.timeline_image_container_theme, .timeline_image_container_falconbouquet{
+    text-align:center;
+    background:#e6e6e6;
+    opacity:0.5;
+}
+
+.timeline_image_theme, .timeline_image_falconbouquet{
+    padding-top:10px;
+    padding-bottom:5px;
 }

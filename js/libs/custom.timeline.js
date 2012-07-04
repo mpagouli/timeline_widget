@@ -17,23 +17,35 @@
             label: undefined,
             index: undefined,
             elementClicked: function(){},
-            elementBind: function(){}
+            elementDBLClicked: function(){}//,
+            //elementBind: function(){}
         },
 
         //initialization 
         _create: function () {
-            var bindInfo, eData;
+            var bindInfo, eData, widget, dblclick, d;
             this.element.addClass('timeline_element').bind('click',{widget:this},function(e){
                 //e.data.widget.element.trigger('elementClicked', [e.data.widget.options]);
                 //e.data.widget._trigger('elementClicked', null, e.data.widget.options);
-                e.data.widget.options.elementClicked(e.data.widget.options);
+                //e.data.widget.options.elementClicked(e.data.widget.options);
+                setTimeout(function () {
+                    dblclick = parseInt(e.data.widget.element.data('double'), 10);
+                    if (dblclick > 0) {
+                        e.data.widget.element.data('double', dblclick-1);
+                    } else {
+                        e.data.widget.options.elementClicked(e.data.widget.options);
+                    }
+                }, 200);
+            }).bind ('dblclick', {widget:this}, function(e) {
+                e.data.widget.element.data('double', 2);
+                 e.data.widget.options.elementDBLClicked(e.data.widget.options);
             });
 
-            bindInfo = this.options.elementBind(this.options);
+            /*bindInfo = this.options.elementBind(this.options);
             if(bindInfo!==undefined && bindInfo.e!==undefined && bindInfo.cb !== undefined){
                 eData = (bindInfo.data === undefined)? {elem:this.options} : $.extend({},this.options,bindInfo.data);
                 this.element.bind(bindInfo.e, bindInfo.cb);
-            }
+            }*/
             
         }
 
@@ -86,12 +98,14 @@
             elements: [],
             elementStyle: function(){},
             elementClicked: function(){},
-            elementBind: function(){}
+            wsStyle: function(){},
+            elementDBLClicked: function(){}//,
+            //elementBind: function(){}
         },
 
         //initialization 
         _create: function () {
-            var width, height, unit_width;
+            var width, height, unit_width, ws_style;
             width = this._getSizeString(this.options.width);
             height = this._getSizeString(this.options.height);
             unit_width = this._getSizeString({
@@ -99,7 +113,9 @@
                 unit: this.options.unit_width.unit
             });
 
-            this.element.addClass('working_set').draggable(this.options.drag_opts);
+            ws_style = this.options.wsStyle(this.options.unit_width, this.options.row_height, this.options.width, this.options.height);
+            ws_style = (ws_style !== undefined)? ws_style : 'working_set_theme'; 
+            this.element.addClass('working_set').addClass(ws_style).draggable(this.options.drag_opts);
             this.element.css({
                 'width': width,
                 'height': height,
@@ -148,7 +164,7 @@
             
             //this._trigger('elementStyle', null, time_element);
             style_class = this.options.elementStyle(time_element);
-            newElement.addClass('timeline_element_default');
+            newElement.addClass('timeline_element_theme');
             if(style_class !== undefined) { 
                 newElement.addClass(style_class); 
             }
@@ -163,7 +179,7 @@
             });
 
             time_element.elementClicked = this.options.elementClicked;
-            time_element.elementBind = this.options.elementBind;
+            time_element.elementDBLClicked = this.options.elementDBLClicked;
             newElement._timeline_element(time_element);
         }
     });
@@ -310,17 +326,17 @@
             viewport_elements: 10,
             headers: [],
             legend_width: {
-                number: 60,
+                number: 80,
                 unit: 'px'
             },
-            min_width: '660px',
+            min_width: '680px',
             min_height: '320px',
             h_label_css: {
                 'font-family': 'Verdana',
                 'font-size': '10px',
                 'font-style': 'normal',
                 'font-weight': 'bold',
-                'padding': '0px 0px',
+                //'padding': '0px 0px',
                 'text-align': 'center'
             },
             legend_css: {
@@ -328,15 +344,19 @@
                 'font-size': '10px',
                 'font-style': 'normal',
                 'font-weight': 'bold',
-                'padding': '0px 0px',
-                'text-align': 'center',
-                'border-top': '1px solid'
+                'padding': '12px 5px',
+                'text-align': 'center'//,
+                //'border-top': '1px solid black'
             },
             elementStyle : function(){},
             elementClicked: function(){},
             legendClicked: function(){},
             legendStyleText: function(){},
-            elementBind: function(){}
+            elementDBLClicked: function(){},
+            headerStyleText: function(){},
+            timelineImg: function(){},
+            wsStyle: function(){},
+            //elementBind: function(){}
         },
 
         _setSize: function (typ, val) {
@@ -695,7 +715,7 @@
         //initialization
         _create: function () {
 
-            var timeline_widths, timeline_heights, width_unit, height_unit, headersCont, headers, header, legendsCont, baseHeader, legends, wrapper, widget, triggerelementStyle, workSetCont, workSet, ws_boundaries, newAround;
+            var timeline_widths, timeline_heights, width_unit, height_unit, headersCont, headers, header, legendsCont, baseHeader, legends, image, wrapper, widget, triggerelementStyle, workSetCont, workSet, ws_boundaries, newAround;
             if (this.options.headers.length === 0) {
                 this._initializeHeaders();
             }
@@ -799,10 +819,12 @@
                 },
                 elementStyle: this.options.elementStyle,
                 elementClicked: this.options.elementClicked,
-                elementBind: this.options.elementBind
+                elementDBLClicked: this.options.elementDBLClicked,
+                wsStyle: this.options.wsStyle
+                //elementBind: this.options.elementBind
             });
 
-            $(".headers_container").position({
+            /*$(".headers_container").position({
                 my: "left bottom",
                 at: "left top",
                 of: $(".ws_container")
@@ -811,7 +833,24 @@
                 my: "right top",
                 at: "left top",
                 of: $(".ws_container")
+            });*/
+
+
+            image = this.options.timelineImg(this.options.legend_width, {number: timeline_heights.headers_viewport , unit: height_unit});
+            image = (image === undefined || image.src === undefined)? { src: 'images/clock.png', style_class: 'timeline_image_theme'} : image;
+            if(image.style_class === undefined) { image.style_class = 'timeline_image_theme'; }
+            if(image.alt === undefined) { image.alt = ''; }
+
+            if(image.parent_class === undefined) {image.parent_class = 'timeline_image_container_theme';}
+            $('<div></div>').prependTo(this.element).addClass('timeline_image_container').addClass(image.parent_class).css({
+                'width': (this.options.legend_width.number-1) + this.options.legend_width.unit,
+                'height': timeline_heights.headers_viewport + height_unit//,
+                //'line-height': timeline_heights.headers_viewport + height_unit
             });
+            $('<img src="'+image.src+'" />').prependTo('.timeline_image_container').addClass('timeline_image').addClass(image.style_class).attr('alt',image.alt);
+            if(image.width !== undefined) { $('.timeline_image').css({'width':image.width}); }
+            if(image.height !== undefined) { $('.timeline_image').css({'height':image.height}); }
+            if(image.title !== undefined) {$('.timeline_image').attr('title',image.title);}
 
             ws_boundaries = this._loadWS(new Date(), timeline_widths, timeline_heights);
 
@@ -866,14 +905,6 @@
             /*$(".ws_container").bind('time_element_clicked', function(event, elem){
                 //alert(elem.label);
             });*/
-            $(".ws_container").bind('xixixi', function (event,time_elem) { 
-            alert('ddd'); 
-            //this.options.beforeElemDrawCb(el)
-            }
-            );
-
-            //this.options.beforeElemDrawCb();
-            //this._trigger('complete', null, { value: 100 });
         },
 
 
@@ -905,7 +936,7 @@
                 //this._trigger('legendStyleText',null, row_elems);
                 style_text = this.options.legendStyleText(row_elems);
                 elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
-                style_class = "timeline_legend_default";
+                style_class = "timeline_legend_theme";
                 if(style_text !== undefined){
                     if(style_text.text !== undefined){
                         elems_label = style_text.text;
@@ -932,7 +963,7 @@
                     $('<div></div>').appendTo(".timeline_legend").css({
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
                         'left': '0px',
-                        'border-top': '1px solid'
+                        //'border-top': '1px solid'
                     })
                     .css(css)
                     .addClass(style_class)
@@ -969,13 +1000,14 @@
                 header_height: 40,
                 header_span: 1,
                 type: 'date',
-                type_format: 'd/mm/yyyy',
+                type_format: 'ddd d mmm yyyy',
                 label_css: {
                     'font-family': 'Verdana',
                     'font-size': '11px',
                     'font-style': 'italic',
+                    //'line-height': '40'+this.options.unit_width.unit,
                     'font-weight': 'bold',
-                    'padding': '5px 10px'
+                    'padding': '12px 5px'
                 },
                 start: new Date(),
                 step: 1
@@ -1001,7 +1033,7 @@
         },
 
         _setLabels: function (i, header_width, ws_width) {
-            var header, labels_count, now, appendTo, css, label_text, j, paddingLeft, paddingRight, paddingTop, paddingBottom;
+            var header, labels_count, now, appendTo, css, label_text, j, paddingLeft, paddingRight, paddingTop, paddingBottom, style_text, style_class;
             header = this.options.headers[i];
             labels_count = Math.round(ws_width / header_width);
             now = header.start;
@@ -1010,11 +1042,26 @@
             label_text = (header.type === 'date') ? now.format(header.type_format) : ((header.type === 'month') ? now.format("mmmm") : ((header.type === 'year') ? now.format("yyyy") : header.type_format + " " + now));
 
             for (j = 0; j < labels_count; j += 1) {
+
+                style_text = this.options.headerStyleText(now);
+                style_class = "timeline_header_theme";
+                if(style_text !== undefined){
+                    if(style_text.text !== undefined){
+                        label_text = style_text.text;
+                    }
+                    if(style_text.style !== undefined){
+                        style_class = style_text.style;
+                    }
+                }
+
                 $('<div></div>').appendTo(appendTo).css({
                     'top': '0px',
-                    'left': j * header_width + this.options.unit_width.unit,
-                    'border-right': '1px solid'
-                }).css(css).text(label_text);
+                    'left': j * header_width + this.options.unit_width.unit//,
+                    //'border-right': '1px solid'
+                })
+                .css(css)
+                .text(label_text)
+                .addClass(style_class);
                 paddingLeft = this._getSizeHash($(appendTo + ' div').css('padding-left')).number;
                 paddingRight = this._getSizeHash($(appendTo + ' div').css('padding-right')).number;
                 paddingTop = this._getSizeHash($(appendTo + ' div').css('padding-top')).number;
@@ -1085,7 +1132,7 @@
                     $('#header_layer' + i).css({
                         'height': headers[i].header_height + this.options.row_height.unit,
                         'width': ws_width + 'px',
-                        'border-bottom': '1px solid black'
+                        'border-bottom': '1px solid'
                     });
                     this._setLabels(i, layer_header_width, ws_width);
                 }
