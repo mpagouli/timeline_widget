@@ -3,7 +3,7 @@
     "use strict";
 
     /************************* _TIMELINE_ELEMENT ***************************/
-    $.widget("custom._timeline_element", $.ui.mouse, {
+    $.widget("jblackbird._timeline_element", $.ui.mouse, {
 
         //default options
         options: {
@@ -23,7 +23,7 @@
 
         //initialization 
         _create: function () {
-            var bindInfo, eData, widget, dblclick, d;
+            var bindInfo, eData, widget, dblclick;
             this.element.addClass('timeline_element').bind('click',{widget:this},function(e){
                 //e.data.widget.element.trigger('elementClicked', [e.data.widget.options]);
                 //e.data.widget._trigger('elementClicked', null, e.data.widget.options);
@@ -53,20 +53,33 @@
 
 
     /************************* _TIMELINE_LEGEND ***************************/
-    $.widget("custom._timeline_legend", $.ui.mouse, {
+    $.widget("jblackbird._timeline_legend", $.ui.mouse, {
 
         //default options
         options: {
             row_elems: [],
-            legendClicked: function(){}
+            legendClicked: function(){},
+            legendDBLClicked: function(){}
         },
 
         //initialization 
         _create: function () {
+            var widget, dblclick;
             this.element.bind('click',{widget:this},function(e){
                 //e.data.widget.element.trigger('time_legend_clicked', [e.data.widget.options.row_elems]);
                 //e.data.widget._trigger('legendClicked', null, e.data.widget.options.row_elems);
-                e.data.widget.options.legendClicked(e.data.widget.options.row_elems);
+                //e.data.widget.options.legendClicked(e.data.widget.options.row_elems);
+                setTimeout(function () {
+                    dblclick = parseInt(e.data.widget.element.data('double'), 10);
+                    if (dblclick > 0) {
+                        e.data.widget.element.data('double', dblclick-1);
+                    } else {
+                        e.data.widget.options.legendClicked(e.data.widget.options.row_elems);
+                    }
+                }, 200);
+            }).bind ('dblclick', {widget:this}, function(e) {
+                e.data.widget.element.data('double', 2);
+                e.data.widget.options.legendDBLClicked(e.data.widget.options.row_elems);
             });
         }
         
@@ -74,10 +87,11 @@
 
 
     /************************* _WORKING SET ***************************/
-    $.widget("custom._working_set", $.ui.mouse, {
+    $.widget("jblackbird._working_set", $.ui.mouse, {
 
         //default options
         options: {
+            theme:'theme',
             unit_width: {
                 number: 40,
                 unit: 'px'
@@ -114,7 +128,7 @@
             });
 
             ws_style = this.options.wsStyle(this.options.unit_width, this.options.row_height, this.options.width, this.options.height);
-            ws_style = (ws_style !== undefined)? ws_style : 'working_set_theme'; 
+            ws_style = (ws_style !== undefined)? ws_style : 'working_set_' + this.options.theme; 
             this.element.addClass('working_set').addClass(ws_style).draggable(this.options.drag_opts);
             this.element.css({
                 'width': width,
@@ -164,7 +178,7 @@
             
             //this._trigger('elementStyle', null, time_element);
             style_class = this.options.elementStyle(time_element);
-            newElement.addClass('timeline_element_theme');
+            newElement.addClass('timeline_element_' + this.options.theme);
             if(style_class !== undefined) { 
                 newElement.addClass(style_class); 
             }
@@ -186,7 +200,7 @@
 
 
     /******************* _VIEWPORT WIDGET ***************************/
-    $.widget("custom._viewport", $.ui.mouse, {
+    $.widget("jblackbird._viewport", $.ui.mouse, {
 
         //default options
         options: {
@@ -303,11 +317,12 @@
 
 
     /******************* TIMELINE WIDGET ***************************/
-    $.widget("custom.timeline", $.ui.mouse, {
+    $.widget("jblackbird.timeline", $.ui.mouse, {
 
 
         //default options
         options: {
+            theme: 'theme',
             width: '',
             height: '',
             //unit:'px',
@@ -332,7 +347,7 @@
             min_width: '680px',
             min_height: '320px',
             h_label_css: {
-                'font-family': 'Verdana',
+                'font-family': '"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif',
                 'font-size': '10px',
                 'font-style': 'normal',
                 'font-weight': 'bold',
@@ -348,9 +363,13 @@
                 'text-align': 'center'//,
                 //'border-top': '1px solid black'
             },
+            legendsDraggable:false,
+            legendsLeftPosition: undefined,
+            legendsZIndex: 1000,
             elementStyle : function(){},
             elementClicked: function(){},
             legendClicked: function(){},
+            legendDBLClicked: function(){},
             legendStyleText: function(){},
             elementDBLClicked: function(){},
             headerStyleText: function(){},
@@ -732,8 +751,8 @@
             });
 
             headersCont = $("<div class='headers_container'></div>").appendTo(this.element).css({
-                'position': 'relative',
-                'border-left': '1px solid'
+                'position': 'relative'//,
+                //'border-left': '1px solid'
             })._viewport({
                 width: {
                     number: timeline_widths.ws_viewport,
@@ -766,6 +785,17 @@
                 'width': this.options.legend_width.number + this.options.legend_width.unit,
                 'height': timeline_heights.ws + this.options.unit_width.unit
             }).appendTo('.legends_container');
+
+            if(this.options.legendsLeftPosition!==undefined){
+                if(this.options.legendsZIndex === undefined) { this.options.legendsZIndex = 1000; }
+                $('.legends_container').css({'zIndex':this.options.legendsZIndex,'left':this.options.legendsLeftPosition});
+            }
+
+            if(this.options.legendsDraggable){
+                if(this.options.legendsZIndex === undefined) { this.options.legendsZIndex = 1000; }
+                $(".legends_container").draggable({ axis:"x", appendTo: "body", zIndex:this.options.legendsZIndex });
+                $(".legends_container").bind('dragstop', {widget:this}, function(e) { $(e.target).css({'zIndex':e.data.widget.options.legendsZIndex}); });
+            }
 
             /*$('.legends_container').bind('time_legend_clicked', function(event, elems){ 
                 //alert(elems.row_elems.length);
@@ -807,6 +837,7 @@
             //triggerelementStyle = this.options.elementStyle;
 
             workSet = $("<div></div>").appendTo('.ws_container')._working_set({ 
+                theme: this.options.theme,
                 unit_width: this.options.unit_width,
                 row_height: this.options.row_height,
                 width: {
@@ -837,11 +868,11 @@
 
 
             image = this.options.timelineImg(this.options.legend_width, {number: timeline_heights.headers_viewport , unit: height_unit});
-            image = (image === undefined || image.src === undefined)? { src: 'images/clock.png', style_class: 'timeline_image_theme'} : image;
-            if(image.style_class === undefined) { image.style_class = 'timeline_image_theme'; }
+            image = (image === undefined || image.src === undefined)? { src: 'images/clock.png', style_class: 'timeline_image_' + this.options.theme } : image;
+            if(image.style_class === undefined) { image.style_class = 'timeline_image_' + this.options.theme; }
             if(image.alt === undefined) { image.alt = ''; }
 
-            if(image.parent_class === undefined) {image.parent_class = 'timeline_image_container_theme';}
+            if(image.parent_class === undefined) {image.parent_class = 'timeline_image_container_' + this.options.theme;}
             $('<div></div>').prependTo(this.element).addClass('timeline_image_container').addClass(image.parent_class).css({
                 'width': (this.options.legend_width.number-1) + this.options.legend_width.unit,
                 'height': timeline_heights.headers_viewport + height_unit//,
@@ -936,7 +967,7 @@
                 //this._trigger('legendStyleText',null, row_elems);
                 style_text = this.options.legendStyleText(row_elems);
                 elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
-                style_class = "timeline_legend_theme";
+                style_class = "timeline_legend_" + this.options.theme;
                 if(style_text !== undefined){
                     if(style_text.text !== undefined){
                         elems_label = style_text.text;
@@ -962,13 +993,16 @@
                     
                     $('<div></div>').appendTo(".timeline_legend").css({
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
-                        'left': '0px',
+                        'left': '0px'//,
                         //'border-top': '1px solid'
                     })
                     .css(css)
                     .addClass(style_class)
                     .text(elems_label)
-                    ._timeline_legend({ row_elems: $.extend([], row_elems), legendClicked: this.options.legendClicked });
+                    ._timeline_legend({ 
+                        row_elems: $.extend([], row_elems), 
+                        legendClicked: this.options.legendClicked,
+                        legendDBLClicked: this.options.legendDBLClicked });
 
                 }
 
@@ -1002,9 +1036,9 @@
                 type: 'date',
                 type_format: 'ddd d mmm yyyy',
                 label_css: {
-                    'font-family': 'Verdana',
+                    'font-family': '"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif',
                     'font-size': '11px',
-                    'font-style': 'italic',
+                    'font-style': 'normal',
                     //'line-height': '40'+this.options.unit_width.unit,
                     'font-weight': 'bold',
                     'padding': '12px 5px'
@@ -1016,7 +1050,7 @@
             {
                 header_height: 20,
                 header_span: 7,
-                type: 'custom',
+                type: '" + this.options.theme',
                 type_format: 'week',
                 label_css : {  'font-family': 'Verdana',
                                'font-size':'10px',
@@ -1044,7 +1078,7 @@
             for (j = 0; j < labels_count; j += 1) {
 
                 style_text = this.options.headerStyleText(now);
-                style_class = "timeline_header_theme";
+                style_class = "timeline_header_" + this.options.theme;
                 if(style_text !== undefined){
                     if(style_text.text !== undefined){
                         label_text = style_text.text;
@@ -1131,8 +1165,8 @@
                     $("<div id='header_layer" + i + "' class='timeline_header'></div>").prependTo('.headers');
                     $('#header_layer' + i).css({
                         'height': headers[i].header_height + this.options.row_height.unit,
-                        'width': ws_width + 'px',
-                        'border-bottom': '1px solid'
+                        'width': ws_width + 'px'//,
+                        //'border-bottom': '1px solid'
                     });
                     this._setLabels(i, layer_header_width, ws_width);
                 }

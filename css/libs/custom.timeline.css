@@ -24,6 +24,7 @@ div.timeline_legend{
     position:absolute;
     top:0px;
     left:0px;  
+    /*zIndex:1000;*/
 }
 
 .timeline_header div, .timeline_legend div {
@@ -51,24 +52,70 @@ div.timeline_legend{
 
 
 /*****************************THEMES**********************************/
-/**DEFAULT FALCON BOUQUET ********************************************/
 
-.working_set_theme, .working_set_falconbouquet{
+/**DEFAULT GRAY*******************************************************/
+.working_set_theme{
+    background: transparent;
+    opacity:0.8;
+    background-image: -webkit-linear-gradient(0, #ffffff 50%, rgba(230, 230, 230, .9) 50%);
+    background-image: -moz-linear-gradient(0, #ffffff 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -ms-linear-gradient(0, #ffffff 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -o-linear-gradient(0, #ffffff 50%, rgba(230, 230, 230, .5) 50%); 
+}
+
+.timeline_element_theme{
+    opacity:0.7;
+    background: #003366;
+    border-radius : 4px;
+}
+
+.timeline_legend_theme, .timeline_header_theme {
+    background-color: #eee;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eee), color-stop(100%, #ccc));
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: -moz-linear-gradient(top, #eee, #ccc);
+    background-image: -ms-linear-gradient(top, #eee, #ccc);
+    background-image: -o-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(top, #eee, #ccc);
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #bbb;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: #333;
+    text-shadow: 0 1px 0 #eee;
+}
+
+.timeline_image_container_theme, .timeline_image_container_blueskip, .timeline_image_container_blueskipmirror{
+    text-align:center;
+    background:transparent;
+    opacity:0.5;
+}
+
+.timeline_image_theme, .timeline_image_falconbouquet, .timeline_image_blueskip, .timeline_image_blueskipmirror{
+    padding-top:10px;
+    padding-bottom:5px;
+}
+
+
+
+/**FALCON BOUQUET ****************************************************/
+.working_set_falconbouquet, .working_set_blueskip, .working_set_blueskipmirror{
     background: transparent;
     opacity:0.8;
     background-image: -webkit-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
     background-image: -moz-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
     background-image: -ms-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
-    background-image: -o-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);
+    background-image: -o-linear-gradient(0, #cecfce 50%, rgba(230, 230, 230, .5) 50%);   
 }
 
-.timeline_element_theme, .timeline_element_falconbouquet{
+.timeline_element_falconbouquet, .timeline_element_blueskip, .timeline_element_blueskipmirror{
     opacity:0.7;
     background: #028482;
     border-radius : 4px;
 }
 
-.timeline_legend_theme, .timeline_legend_falconbouquet{
+.timeline_legend_falconbouquet, .timeline_header_falconbouquet{
     text-shadow: 1px 1px 0px #84596b;
     color: white;
     border-top: 1px solid #84596b;
@@ -79,28 +126,68 @@ div.timeline_legend{
     background-image: -webkit-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*new webkit*/
     background-image: -ms-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*IE10*/
     background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #84596b),color-stop(0.51, #B58AA5)); /*old webkit*/
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 0 0 #b58aa5;
+    -moz-box-shadow: inset 0 1px 0 0 #b58aa5;
+    box-shadow: inset 0 1px 0 0 #b58aa5;
+
+    border: 1px solid #84596b;
+    border-bottom: 1px solid #84596b;
 }
 
-.timeline_header_theme, .timeline_header_falconbouquet{
-    text-shadow: 1px 1px 0px #84596b;
-    color: white;
-    border-right: 1px solid #84596b;
-    background: #84596B; /*fallback for non-CSS3 browsers*/
-    background-image: linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*future CSS3 browsers*/
-    background-image: -o-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*opera 11.10+*/
-    background-image: -moz-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*gecko*/
-    background-image: -webkit-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*new webkit*/
-    background-image: -ms-linear-gradient(bottom, #84596b 0%, #b58aa5 51%); /*IE10*/
-    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #84596b),color-stop(0.51, #B58AA5)); /*old webkit*/
-}
-
-.timeline_image_container_theme, .timeline_image_container_falconbouquet{
+.timeline_image_container_falconbouquet{
     text-align:center;
     background:#e6e6e6;
     opacity:0.5;
 }
 
-.timeline_image_theme, .timeline_image_falconbouquet{
-    padding-top:10px;
-    padding-bottom:5px;
+
+
+
+/**BLUE SKIP *********************************************************/
+.timeline_legend_blueskip, .timeline_header_blueskip {
+    background-color: #8C9CBF;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0% #8C9CBF),color-stop(100%, #3D5691));
+    background-image: -webkit-linear-gradient(top, #8C9CBF 0%, #3D5691 100%);
+    background-image: -moz-linear-gradient(top, #8C9CBF 0%, #3D5691 100%);
+    background-image: -ms-linear-gradient(top, #8C9CBF 0%, #3D5691 100%);
+    background-image: -o-linear-gradient(top, #8C9CBF 0%, #3D5691 100%);
+    background-image: linear-gradient(top, #8C9CBF 0%, #3D5691 100%);
+    border: 1px solid #172D6E;
+    border-bottom: 1px solid #0E1D45;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 0 0 #B1B9CB;
+    -moz-box-shadow: inset 0 1px 0 0 #b1b9cb;
+    box-shadow: inset 0 1px 0 0 #B1B9CB;
+    color: white;
+    /*text-shadow: 0 -1px 1px #000F4D;*/
+}
+
+
+
+
+/**BLUE SKIP MIRROR **************************************************/
+.timeline_legend_blueskipmirror, .timeline_header_blueskipmirror {
+    background-color: #8C9CBF;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8C9CBF), color-stop(50%, #546A9E), color-stop(50%, #36518F), color-stop(100%, #3D5691));
+    background-image: -webkit-linear-gradient(top, #8C9CBF 0%, #546A9E 50%, #36518F 50%, #3D5691 100%);
+    background-image: -moz-linear-gradient(top, #8C9CBF 0%, #546A9E 50%, #36518F 50%, #3D5691 100%);
+    background-image: -ms-linear-gradient(top, #8C9CBF 0%, #546A9E 50%, #36518F 50%, #3D5691 100%);
+    background-image: -o-linear-gradient(top, #8C9CBF 0%, #546A9E 50%, #36518F 50%, #3D5691 100%);
+    background-image: linear-gradient(top, #8C9CBF 0%, #546A9E 50%, #36518F 50%, #3D5691 100%);
+    border: 1px solid #172D6E;
+    border-bottom: 1px solid #0E1D45;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 0 0 #B1B9CB;
+    -moz-box-shadow: inset 0 1px 0 0 #b1b9cb;
+    box-shadow: inset 0 1px 0 0 #B1B9CB;
+    color: white;
+    /*text-shadow: 0 -1px 1px #000F4D;*/
 }

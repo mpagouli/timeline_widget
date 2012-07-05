@@ -1,8 +1,8 @@
 $(document).ready(function(){
 	
     var bar = $("<div></div>").css({
-        'overflow': 'visible',
-        'border': '1px solid'
+        'overflow': 'visible'//,
+        //'border': '1px solid'
     }).appendTo("body");
 
 
@@ -104,15 +104,20 @@ $(document).ready(function(){
     bar.timeline({
         width: '680px',
         height: '320px',
+        //theme: 'blueskip',
         //elementStyle: defineElemColor,
         //legendStyleText: defineLegend,
         elementClicked: showElemInfo,
         elementDBLClicked: showElemInfo,
         legendClicked: showLegendInfo,
+        legendDBLClicked: showLegendInfo,
         //headerStyleText: defineHeaderStyle,
         //elementBind: elementDBL,
         //timelineImg: setImgStyleAltSize,
         //wsStyle: defineWSStyle,
+        //legendsDraggable:true,
+        //legendsLeftPosition:'300px',
+        //legendsZIndex:10000,
         elements: [{
             id: 1,
             //start: 1.5,
@@ -158,6 +163,7 @@ $(document).ready(function(){
             label: "Elem F"
         }]
     });
+
 
     //var bb = bar.data( "timeline" );
     //alert(bb.options.unit_width.number);
