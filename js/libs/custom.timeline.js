@@ -16,6 +16,7 @@
             days: undefined,
             label: undefined,
             index: undefined,
+            row: undefined,
             elementClicked: function(){},
             elementDBLClicked: function(){}//,
             //elementBind: function(){}
@@ -189,7 +190,7 @@
                 'height': (this.options.row_height.number / 2) + this.options.row_height.unit,
                 'width': this.options.unit_width.number * time_element.size + 'px',
                 'left': this.options.unit_width.number * time_element.start + 'px',
-                'top': time_element.index * this.options.row_height.number + 'px'
+                'top': time_element.row * this.options.row_height.number + 'px'
             });
 
             time_element.elementClicked = this.options.elementClicked;
@@ -329,7 +330,7 @@
             elements: [],
             ws_elements: [],
             unit_width: {
-                number: 120,
+                number: 80,
                 unit: 'px'
             },
             viewport_units: 5,
@@ -338,13 +339,13 @@
                 number: 40,
                 unit: 'px'
             },
-            viewport_elements: 10,
+            viewport_elements: undefined,
             headers: [],
             legend_width: {
-                number: 80,
+                number: 50,
                 unit: 'px'
             },
-            min_width: '680px',
+            min_width: '450px',
             min_height: '320px',
             h_label_css: {
                 'font-family': '"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif',
@@ -363,6 +364,7 @@
                 'text-align': 'center'//,
                 //'border-top': '1px solid black'
             },
+            indexes: [],
             legendsDraggable:false,
             legendsLeftPosition: undefined,
             legendsZIndex: 1000,
@@ -452,20 +454,33 @@
 
         _initHeights: function () {
             var def_viewport_height, ws_height, headers_viewport_height, default_height, min_height, given_height;
-            def_viewport_height = this.options.row_height.number * this.options.viewport_elements;
-            ws_height = (this.options.viewport_elements > this.options.elements.length) ? def_viewport_height : this.options.row_height.number * this.options.elements.length;
             headers_viewport_height = this._getHeadersDivHeight(this.options.headers);
-            default_height = {
-                number: def_viewport_height + headers_viewport_height,
-                unit: this.options.row_height.unit
-            };
             min_height = this._getSizeHash(this.options.min_height);
+            if(this.options.viewport_elements !== undefined){
+                def_viewport_height = this.options.row_height.number * this.options.viewport_elements;
+                ws_height = (this.options.viewport_elements > this.options.elements.length) ? def_viewport_height : this.options.row_height.number * this.options.elements.length;
+                default_height = {
+                    number: def_viewport_height + headers_viewport_height,
+                    unit: this.options.row_height.unit
+                };  
+            }
+            else{
+                var c = this._getSizeHash(this.options.height);
+                def_viewport_height = this._convert(c, this.options.row_height.unit);
+                ws_height = def_viewport_height;
+                default_height = {
+                    number: def_viewport_height,
+                    unit: this.options.row_height.unit
+                };
+            }
             given_height = this._initGiven(min_height, default_height, 'height');
+            
 
             return {
                 timeline: given_height,
                 ws_viewport: given_height.number - headers_viewport_height,
                 ws: ws_height,
+                //ws: given_height.number - headers_viewport_height,
                 headers_viewport: headers_viewport_height
             };
         },
@@ -481,14 +496,14 @@
             while (help.length > 0) {
 
                 f = help[0];
-                f.index = rowIndex;
+                f.row = rowIndex;
                 indexesToRemove = [];
                 sorted.push(f);
                 help.splice(0, 1);
                 for (i = 0; i < help.length; i += 1) {
                     //if (help[i].startDate.getTime() >= f.endDate.getTime() || help[i].endDate.getTime() <= f.startDate.getTime()) {
                     if (help[i].start >= f.end || help[i].end <= f.start) {
-                        help[i].index = rowIndex;
+                        help[i].row = rowIndex;
                         indexesToRemove.push(i);
                         sorted.push(help[i]);
                     }
@@ -501,7 +516,7 @@
             }
 
             /*var y = "BEFORE: ";
-            for(var i=0; i<sorted.length; i++){ y += "id:"+sorted[i].id+"-index:"+sorted[i].index+" "; }
+            for(var i=0; i<sorted.length; i++){ y += "id:"+sorted[i].id+"-index:"+sorted[i].row+" "; }
             alert(y);*/
 
             if (old !== undefined) {
@@ -509,7 +524,7 @@
             }
 
             /*var x = "AFTER: ";
-            for(var i=0; i<sorted.length; i++){ x += "id:"+sorted[i].id+"-index:"+sorted[i].index+" "; }
+            for(var i=0; i<sorted.length; i++){ x += "id:"+sorted[i].id+"-index:"+sorted[i].row+" "; }
             alert(x);*/
 
             return sorted;
@@ -521,8 +536,8 @@
             res = $.extend([], sorted);
             for (j = 0; j < old.length; j += 1) {
                 for (i = 0; i < res.length; i += 1) {
-                    if (res[i].id === old[j].id && res[i].index !== old[j].index) {
-                        this._switchIndexes(res, res[i].index, old[j].index);
+                    if (res[i].id === old[j].id && res[i].row !== old[j].row) {
+                        this._switchIndexes(res, res[i].row, old[j].row);
                     }
                 }
             }
@@ -532,10 +547,10 @@
         _switchIndexes: function (elems, newIndex, oldIndex) {
             var i;
             for (i = 0; i < elems.length; i += 1) {
-                if (elems[i].index === newIndex) {
-                    elems[i].index = oldIndex;
-                } else if (elems[i].index === oldIndex) {
-                    elems[i].index = newIndex;
+                if (elems[i].row === newIndex) {
+                    elems[i].row = oldIndex;
+                } else if (elems[i].row === oldIndex) {
+                    elems[i].row = newIndex;
                 }
             }
         },
@@ -543,7 +558,7 @@
 
         _loadWS: function (around, timeline_widths, timeline_heights, oldElems) {
 
-            var ws_boundaries, header_width, ws_viewport_center, ws_center, centerDiff, quotient, wsOffsetX, unitsBef, typ, typFormat, headerStart, headerUnits, headerEnd, wsElems;
+            var ws_boundaries, header_width, ws_viewport_center, ws_center, centerDiff, quotient, wsOffsetX, unitsBef, typ, typFormat, headerStart, wsElemsHash, headerUnits, headerEnd, wsElems;
             ws_boundaries = {};
 
             //Load elements according to working set bounds
@@ -605,8 +620,11 @@
                 this.options.headers[0].start = headerStart;
 
                 //Working Set Elements to be loaded
-                wsElems = this._getWSElements(headerStart, headerEnd, headerUnits, typ);
-                wsElems = this._sortWSElements(wsElems, oldElems, typ);
+                wsElemsHash = this._getWSElements(headerStart, headerEnd, headerUnits, typ);
+                wsElems = wsElemsHash.elems;
+                if(wsElemsHash.undefinedIndex){
+                    wsElems = this._sortWSElements(wsElems, oldElems, typ);
+                }
                 this.options.ws_elements = $.extend([], wsElems);
 
                 $(".working_set")._working_set('clear');
@@ -668,8 +686,9 @@
 
         _getWSElements: function (headerStart, headerEnd, headerSpan, typ) { //alert( this._monthsDiff(new Date(2012,5,26),new Date(2012,6,2)));
 
-            var elems, wsElems, i, newElem, one_day, endDate, siz, diff, newElemStart, newElemStop, one_sec, one_min, one_hour, one_month, one_year;
+            var elems, wsElems, i, newElem, one_day, endDate, siz, diff, newElemStart, newElemStop, one_sec, one_min, one_hour, one_month, one_year, undefinedIndex;
             elems = this.options.elements;
+            undefinedIndex = false;
             wsElems = [];
             for (i = 0; i < elems.length; i += 1) {
                 newElem = $.extend({}, elems[i]);
@@ -724,11 +743,32 @@
                         newElemStop = newElemStart + newElem.size * this.options.unit_width.number - 1;
                         newElem.start = newElemStart;
                         newElem.end = newElemStop;
+
+                        if(newElem.index === undefined){
+                            undefinedIndex = true;
+                        }
+                        else{
+                            newElem.row = this._getIndexRow(newElem.index);
+                            if(newElem.row === -1){
+                                undefinedIndex = true;
+                            }
+                        }
+
                         wsElems.push(newElem);
                     }
                 }
             }
-            return wsElems;
+            return { elems:wsElems, undefinedIndex:undefinedIndex};
+        },
+
+        _getIndexRow: function(ind){
+            var r;
+            if(this.options.indexes.length !== 0){
+                r = this.options.indexes.indexOf(ind);
+                if(r!==-1) {r = r+1;}
+                return r;
+            }
+            return -1;
         },
 
         //initialization
@@ -914,21 +954,23 @@
                     } 
                     mess += ".";
                     alert(mess)*/
-                    baseHeader = event.data.timeline.options.headers[0];
-                    newAround = new Date(ws_boundaries.start.getTime());
-                    if ($.inArray('right', boundaries) !== -1) {
-                        newAround = new Date(ws_boundaries.end.getTime());
-                        if(baseHeader.type === 'date'){
-                            newAround.setDate(newAround.getDate() - Math.round(event.data.timeline.options.viewport_units/baseHeader.header_span) + 1);
+                    if($.inArray('left', boundaries) !== -1 || $.inArray('right', boundaries) !== -1){
+                        baseHeader = event.data.timeline.options.headers[0];
+                        newAround = new Date(ws_boundaries.start.getTime());
+                        if ($.inArray('right', boundaries) !== -1) {
+                            newAround = new Date(ws_boundaries.end.getTime());
+                            if(baseHeader.type === 'date'){
+                                newAround.setDate(newAround.getDate() - Math.round(event.data.timeline.options.viewport_units/baseHeader.header_span) + 1);
+                            }
+                            else if(baseHeader.type === 'month'){
+                                newAround.setMonth(newAround.getMonth() - Math.round(event.data.timeline.options.viewport_units/baseHeader.header_span) + 1);
+                            }
+                            else if(baseHeader.type === 'year'){
+                                newAround.setFullYear(newAround.getFullYear() - Math.round(event.data.timeline.options.viewport_units/baseHeader.header_span) + 1);
+                            }
                         }
-                        else if(baseHeader.type === 'month'){
-                            newAround.setMonth(newAround.getMonth() - Math.round(event.data.timeline.options.viewport_units/baseHeader.header_span) + 1);
-                        }
-                        else if(baseHeader.type === 'year'){
-                            newAround.setFullYear(newAround.getFullYear() - Math.round(event.data.timeline.options.viewport_units/baseHeader.header_span) + 1);
-                        }
+                        ws_boundaries = event.data.timeline._loadWS(newAround, timeline_widths, timeline_heights, $.extend([], event.data.timeline.options.ws_elements));
                     }
-                    ws_boundaries = event.data.timeline._loadWS(newAround, timeline_widths, timeline_heights, $.extend([], event.data.timeline.options.ws_elements));
                 }
 
             });
@@ -943,7 +985,7 @@
             var res, i;
             res = [];
             for (i = 0; i < elems.length; i += 1) {
-                if (elems[i].index === ind) {
+                if (elems[i].row === ind) {
                     res.push(elems[i]);
                 }
             }
@@ -966,7 +1008,13 @@
 
                 //this._trigger('legendStyleText',null, row_elems);
                 style_text = this.options.legendStyleText(row_elems);
-                elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
+
+                //elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
+                elems_label = (row_elems.length!==0)? row_elems[0].index : "";
+                if(this.options.indexes.length !== 0) {
+                    elems_label = this.options.indexes[j-1];
+                }
+                
                 style_class = "timeline_legend_" + this.options.theme;
                 if(style_text !== undefined){
                     if(style_text.text !== undefined){
@@ -977,7 +1025,7 @@
                     }
                 }
 
-                if (row_elems.length === 0) {
+                if (row_elems.length === 0 || j === 0) {
                     $('<div></div>').appendTo(".timeline_legend").css({
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
                         'left': '0px'
@@ -1234,6 +1282,12 @@
                 return (((size_hash.number * 12) / 16).toFixed(2));
             case 'px_em':
                 return ((size_hash.number / 16).toFixed(2));
+            case 'px_px':
+                return size_hash.number;
+            case 'pt_pt':
+                return size_hash.number;
+            case 'em_em':
+                return size_hash.number;  
 
             default:
                 return 'invalid';

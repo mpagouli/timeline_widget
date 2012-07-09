@@ -102,8 +102,13 @@ $(document).ready(function(){
     };
 
     bar.timeline({
-        width: '680px',
-        height: '320px',
+        unit_width: { number:120, unit:'px' },
+        legend_width: { number:80 , unit:'px' },
+        //viewport_elements:10,
+        /*width: '680px',*/
+        /*height: '320px',*/
+        width: '1180px',
+        height:'500px',
         //theme: 'blueskip',
         //elementStyle: defineElemColor,
         //legendStyleText: defineLegend,
@@ -111,6 +116,7 @@ $(document).ready(function(){
         elementDBLClicked: showElemInfo,
         legendClicked: showLegendInfo,
         legendDBLClicked: showLegendInfo,
+        //indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI'], 
         //headerStyleText: defineHeaderStyle,
         //elementBind: elementDBL,
         //timelineImg: setImgStyleAltSize,
@@ -120,47 +126,41 @@ $(document).ready(function(){
         //legendsZIndex:10000,
         elements: [{
             id: 1,
-            //start: 1.5,
             startDate: new Date(2012, 5, 26),
             days: 7,
-            //index: 1,
-            label: "Elem A"
+            index: 'CarA',
+            label: "Reserv A"
         }, {
             id: 2,
-            //start: 5.3, 
             startDate: new Date(2012, 5, 28),
             days: 4,
-            //index: 2,
-            label: "Elem B"
+            index: 'CarB',
+            label: "Reserv B"
         }, {
-            id: 3,
-            //start: 5.3, 
+            id: 3, 
             startDate: new Date(2012, 5, 20),
             days: 17,
-            //index: 3,
-            label: "Elem C"
+            index: 'CarC',
+            label: "Reserv C"
         }, {
             id: 4,
-            //start: 5.3, 
             startDate: new Date(2012, 5, 2),
             endDate: new Date(2012, 5, 22),
             //days: 21,
-            //index: 4,
-            label: "Elem D"
+            index: 'CarB',
+            label: "Reserv D"
         }, {
             id: 5,
-            //start: 5.3, 
             startDate: new Date(2012, 5, 1),
             days: 10,
-            //index: 5,
-            label: "Elem E"
+            index: 'CarD',
+            label: "Reserv E"
         }, {
             id: 6,
-            //start: 5.3, 
             startDate: new Date(2012, 6, 10),
             days: 5,
-            //index: 5,
-            label: "Elem F"
+            index: 'CarE',
+            label: "Reserv F"
         }]
     });
 
