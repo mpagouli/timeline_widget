@@ -55,10 +55,10 @@ $(document).ready(function(){
     };
 
     var defineLegend = function(elems){
-       if(elems.length!==0){
+       //if(elems.length!==0){
             return {style: 'leg'};
-       }
-       return {text:'No elems'};
+      //}
+       //return {text:'No elems'};
     };
 
     var defineHeaderStyle = function(dat){ //alert(dat)

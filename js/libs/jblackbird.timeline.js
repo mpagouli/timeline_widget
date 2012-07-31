@@ -347,23 +347,6 @@
             },
             min_width: '450px',
             min_height: '320px',
-            h_label_css: {
-                'font-family': '"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif',
-                'font-size': '10px',
-                'font-style': 'normal',
-                'font-weight': 'bold',
-                //'padding': '0px 0px',
-                'text-align': 'center'
-            },
-            legend_css: {
-                'font-family': 'Verdana',
-                'font-size': '10px',
-                'font-style': 'normal',
-                'font-weight': 'bold',
-                'padding': '12px 5px',
-                'text-align': 'center'//,
-                //'border-top': '1px solid black'
-            },
             indexes: [],
             legendsDraggable:false,
             legendsLeftPosition: undefined,
@@ -1000,7 +983,6 @@
             var rows, elems, css, j, row_elems, elems_label, paddingLeft, paddingRight, paddingTop, paddingBottom, style_class, style_text;
             rows = Math.round(ws_height / this.options.row_height.number);
             elems = this.options.ws_elements;
-            css = this.options.legend_css;
 
             for (j = 0; j < rows; j += 1) {
 
@@ -1021,7 +1003,7 @@
                         elems_label = style_text.text;
                     }
                     if(style_text.style !== undefined){
-                        style_class = style_text.style;
+                        style_class += " " + style_text.style;
                     }
                 }
 
@@ -1030,7 +1012,7 @@
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
                         'left': '0px'
                     })
-                    .css(css)
+                    //.css(css)
                     .text(elems_label)
                     .addClass(style_class);
                 } else {
@@ -1044,7 +1026,7 @@
                         'left': '0px'//,
                         //'border-top': '1px solid'
                     })
-                    .css(css)
+                    //.css(css)
                     .addClass(style_class)
                     .text(elems_label)
                     ._timeline_legend({ 
@@ -1085,12 +1067,8 @@
                 //type_format: 'ddd d mmm yyyy',
 				type_format: 'dd/mm/yy',
                 label_css: {
-                    'font-family': '"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif',
                     'font-size': '11px',
-                    'font-style': 'normal',
-                    //'line-height': '40'+this.options.unit_width.unit,
-                    'font-weight': 'bold',
-                    'padding': '12px 5px'
+                    'line-height': '38'+this.options.unit_width.unit
                 },
                 start: new Date(),
                 step: 1
@@ -1121,7 +1099,7 @@
             labels_count = Math.round(ws_width / header_width);
             now = header.start;
             appendTo = (i === 0) ? '.timeline_header' : '#header_layer' + i;
-            css = $.extend({}, this.options.h_label_css, header.label_css);
+			css = $.extend({}, header.label_css);
             label_text = (header.type === 'date') ? now.format(header.type_format) : ((header.type === 'month') ? now.format("mmmm") : ((header.type === 'year') ? now.format("yyyy") : header.type_format + " " + now));
 
             for (j = 0; j < labels_count; j += 1) {

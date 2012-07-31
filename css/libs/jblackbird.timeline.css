@@ -37,6 +37,23 @@ div.timeline_legend{
     left:0px;
 }
 
+.timeline_legend div {
+	font-family: Verdana;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: bold;
+    padding: 12px 5px;
+    text-align: center;
+}
+
+.timeline_header div {
+	font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: bold;
+    text-align: center;
+}
+
 .timeline_header{ 
     overflow:hidden;
     position:absolute;
