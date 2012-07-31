@@ -339,7 +339,7 @@
                 number: 40,
                 unit: 'px'
             },
-            viewport_elements: undefined,
+            //viewport_elements: undefined,
             headers: [],
             legend_width: {
                 number: 50,
@@ -440,30 +440,24 @@
             var def_viewport_height, ws_height, headers_viewport_height, default_height, min_height, given_height;
             headers_viewport_height = this._getHeadersDivHeight(this.options.headers);
             min_height = this._getSizeHash(this.options.min_height);
-            if(this.options.viewport_elements !== undefined){
-                def_viewport_height = this.options.row_height.number * this.options.viewport_elements;
-                ws_height = (this.options.viewport_elements > this.options.elements.length) ? def_viewport_height : this.options.row_height.number * this.options.elements.length;
-                default_height = {
-                    number: def_viewport_height + headers_viewport_height,
-                    unit: this.options.row_height.unit
-                };  
+			def_viewport_height = this._convert(min_height, this.options.row_height.unit);
+			default_height = {
+                number: def_viewport_height,
+                unit: this.options.row_height.unit
+            };
+			given_height = this._initGiven(min_height, default_height, 'height');
+            if(this.options.indexes.length !== 0){
+                ws_height = this.options.row_height.number * this.options.indexes.length; 
             }
             else{
-				def_viewport_height = this._convert(min_height, this.options.row_height.unit);
-                ws_height = def_viewport_height;
-                default_height = {
-                    number: def_viewport_height,
-                    unit: this.options.row_height.unit
-                };
+                ws_height = given_height.number - headers_viewport_height;
             }
-            given_height = this._initGiven(min_height, default_height, 'height');
+			ws_height = (ws_height < (given_height.number - headers_viewport_height))? given_height.number - headers_viewport_height : ws_height;
             
-
             return {
                 timeline: given_height,
                 ws_viewport: given_height.number - headers_viewport_height,
-                //ws: ws_height,
-                ws: given_height.number - headers_viewport_height,
+                ws: ws_height,
                 headers_viewport: headers_viewport_height
             };
         },
@@ -993,8 +987,10 @@
 
                 //elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
                 elems_label = (row_elems.length!==0)? row_elems[0].index : "";
-                if(this.options.indexes.length !== 0 && j>0) {
-                    elems_label = this.options.indexes[j-1];
+                if(this.options.indexes.length !== 0) {
+					if(j>0 && j<=this.options.indexes.length){
+						elems_label = this.options.indexes[j-1];
+					}
                 }
                 
                 style_class = "timeline_legend_" + this.options.theme;
