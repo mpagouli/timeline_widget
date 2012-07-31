@@ -465,8 +465,12 @@
                 };  
             }
             else{
-                var c = this._getSizeHash(this.options.height);
-                def_viewport_height = this._convert(c, this.options.row_height.unit);
+			    if (this.options.height != ''){
+					def_viewport_height = this._convert(this._getSizeHash(this.options.height), this.options.row_height.unit);
+				}
+				else{
+					def_viewport_height = this._convert(min_height, this.options.row_height.unit);
+				}
                 ws_height = def_viewport_height;
                 default_height = {
                     number: def_viewport_height,
@@ -1011,7 +1015,7 @@
 
                 //elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
                 elems_label = (row_elems.length!==0)? row_elems[0].index : "";
-                if(this.options.indexes.length !== 0) {
+                if(this.options.indexes.length !== 0 && j>0) {
                     elems_label = this.options.indexes[j-1];
                 }
                 
@@ -1082,7 +1086,8 @@
                 header_height: 40,
                 header_span: 1,
                 type: 'date',
-                type_format: 'ddd d mmm yyyy',
+                //type_format: 'ddd d mmm yyyy',
+				type_format: 'dd/mm/yy',
                 label_css: {
                     'font-family': '"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif',
                     'font-size': '11px',
