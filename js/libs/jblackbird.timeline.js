@@ -410,6 +410,7 @@
 
             // If given size is percent convert it to pixels
             if (given.unit === '%') {
+			    var parent = this.element.parent();
                 parent_number = (typ === 'width') ? this.element.parent().width() : this.element.parent().height();
                 pixels = ((parent_number * given.number) / 100).toFixed(2);
                 this._setSize(typ, pixels + 'px');
@@ -465,12 +466,7 @@
                 };  
             }
             else{
-			    if (this.options.height != ''){
-					def_viewport_height = this._convert(this._getSizeHash(this.options.height), this.options.row_height.unit);
-				}
-				else{
-					def_viewport_height = this._convert(min_height, this.options.row_height.unit);
-				}
+				def_viewport_height = this._convert(min_height, this.options.row_height.unit);
                 ws_height = def_viewport_height;
                 default_height = {
                     number: def_viewport_height,
@@ -483,8 +479,8 @@
             return {
                 timeline: given_height,
                 ws_viewport: given_height.number - headers_viewport_height,
-                ws: ws_height,
-                //ws: given_height.number - headers_viewport_height,
+                //ws: ws_height,
+                ws: given_height.number - headers_viewport_height,
                 headers_viewport: headers_viewport_height
             };
         },
