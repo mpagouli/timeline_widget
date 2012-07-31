@@ -908,7 +908,7 @@
 
 
             image = this.options.timelineImg(this.options.legend_width, {number: timeline_heights.headers_viewport , unit: height_unit});
-            image = (image === undefined || image.src === undefined)? { src: 'images/clock.png', style_class: 'timeline_image_' + this.options.theme } : image;
+            image = (image === undefined || image.src === undefined)? { src: '', style_class: 'timeline_image_' + this.options.theme } : image;
             if(image.style_class === undefined) { image.style_class = 'timeline_image_' + this.options.theme; }
             if(image.alt === undefined) { image.alt = ''; }
 
