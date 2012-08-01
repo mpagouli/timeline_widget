@@ -188,10 +188,14 @@
                 'margin-top': (this.options.row_height.number / 4) + this.options.row_height.unit,
                 'margin-bottom': (this.options.row_height.number / 4) + this.options.row_height.unit,
                 'height': (this.options.row_height.number / 2) + this.options.row_height.unit,
+			    'line-height': (this.options.row_height.number / 2) + this.options.row_height.unit,
                 'width': this.options.unit_width.number * time_element.size + 'px',
-                'left': this.options.unit_width.number * time_element.start + 'px',
+                'left': time_element.start + 'px',
                 'top': time_element.row * this.options.row_height.number + 'px'
             });
+			if(time_element.label !== undefined && time_element.label !== ''){
+				newElement.html(time_element.label);
+			}
 
             time_element.elementClicked = this.options.elementClicked;
             time_element.elementDBLClicked = this.options.elementDBLClicked;
@@ -427,6 +431,9 @@
             };
             min_width = this._getSizeHash(this.options.min_width);
             given_width = this._initGiven(min_width, default_width, 'width');
+			if(given_width.number !== default_width.number){
+				this.options.viewport_units = Math.round((given_width.number - this.options.legend_width.number) / this.options.unit_width.number);
+			}
 
             return {
                 timeline: given_width,
@@ -465,7 +472,7 @@
 
         _sortWSElements: function (elems, old, typ) {
 
-            var help, rowIndex, sorted, f, indexesToRemove, i;
+            var help, rowIndex, sorted, f, indexesToRemove, i, independent, samerow, t;
             help = $.extend([], elems);
             rowIndex = 1;
             sorted = [];
@@ -477,16 +484,32 @@
                 indexesToRemove = [];
                 sorted.push(f);
                 help.splice(0, 1);
+				samerow = [];
                 for (i = 0; i < help.length; i += 1) {
-                    //if (help[i].startDate.getTime() >= f.endDate.getTime() || help[i].endDate.getTime() <= f.startDate.getTime()) {
+				
                     if (help[i].start >= f.end || help[i].end <= f.start) {
-                        help[i].row = rowIndex;
-                        indexesToRemove.push(i);
-                        sorted.push(help[i]);
+					
+					    if( (help[i].index === undefined && f.index === undefined) || (help[i].index === f.index) ){
+						
+							independent = true;
+							for(t =0; t < samerow.length; t += 1){
+								if ( (samerow[t].start < help[i].start  && help[i].start< samerow[t].end) || (samerow[t].start < help[i].end &&  help[i].end < samerow[t].end) ) {
+									independent = false;
+									break;
+								}
+							}
+							if(independent){
+								help[i].row = rowIndex;
+								indexesToRemove.push(i);
+								sorted.push(help[i]);
+								samerow.push(help[i]);
+							}
+							
+						}
                     }
                 }
-                for (i = 0; i < indexesToRemove.length; i += 1) {
-                    help.splice(indexesToRemove[i], 1);
+                for (i = 0; i < indexesToRemove.length; i += 1) { 
+                    help.splice(indexesToRemove[i] - i, 1); // Every time one element is removed the next indexes must be decreased by 1
                 }
                 rowIndex += 1;
 
@@ -496,7 +519,7 @@
             for(var i=0; i<sorted.length; i++){ y += "id:"+sorted[i].id+"-index:"+sorted[i].row+" "; }
             alert(y);*/
 
-            if (old !== undefined) {
+            if (old !== undefined && old.length !== 0) {
                 sorted = this._keepOldIndexes(sorted, old);
             }
 
@@ -509,23 +532,29 @@
 
         _keepOldIndexes: function (sorted, old) {
 
-            var res, j, i;
+            var res, j, i, old_ids;
             res = $.extend([], sorted);
+			old_ids = [];
+			for (j = 0; j < old.length; j += 1) {
+				old_ids.push(old[j].id);
+			}
             for (j = 0; j < old.length; j += 1) {
                 for (i = 0; i < res.length; i += 1) {
                     if (res[i].id === old[j].id && res[i].row !== old[j].row) {
-                        this._switchIndexes(res, res[i].row, old[j].row);
+                        this._switchIndexes(res, res[i].id, res[i].row, old[j].row, old_ids);
                     }
                 }
             }
             return res;
         },
 
-        _switchIndexes: function (elems, newIndex, oldIndex) {
+        _switchIndexes: function (elems, elem_id, newIndex, oldIndex, old_ids) {
             var i;
             for (i = 0; i < elems.length; i += 1) {
                 if (elems[i].row === newIndex) {
-                    elems[i].row = oldIndex;
+					if( elems[i].index !== undefined || (elems[i].id === elem_id) || ($.inArray(elems[i].id, old_ids) === -1) ){
+						elems[i].row = oldIndex;
+					}
                 } else if (elems[i].row === oldIndex) {
                     elems[i].row = newIndex;
                 }
@@ -599,7 +628,7 @@
                 //Working Set Elements to be loaded
                 wsElemsHash = this._getWSElements(headerStart, headerEnd, headerUnits, typ);
                 wsElems = wsElemsHash.elems;
-                if(wsElemsHash.undefinedIndex){
+                if(wsElemsHash.undefinedIndex && wsElems.length >0 ){
                     wsElems = this._sortWSElements(wsElems, oldElems, typ);
                 }
                 this.options.ws_elements = $.extend([], wsElems);
@@ -669,71 +698,78 @@
             wsElems = [];
             for (i = 0; i < elems.length; i += 1) {
                 newElem = $.extend({}, elems[i]);
-                if ($.type(elems[i].startDate) === 'date') {
+				
+				if( (this.options.indexes.length ===0)  || (this.options.indexes.length !==0 && $.inArray(newElem.index, this.options.indexes) !== -1 ) ){
+				
+					if ($.type(elems[i].startDate) === 'date') {
 
-                    one_sec = 1000;
-                    one_min = 60 * one_sec;
-                    one_hour = 60 * one_min;
-                    one_day = 24 * one_hour;
+						one_sec = 1000;
+						one_min = 60 * one_sec;
+						one_hour = 60 * one_min;
+						one_day = 24 * one_hour;
 
 
-                    if (newElem.endDate === undefined) {
-                        endDate = new Date(newElem.startDate.getTime());
-                        endDate.setDate(newElem.startDate.getDate() + newElem.days - 1);
-                        newElem.endDate = endDate;
-                        siz = newElem.days;
-                    } else {
-                        //siz = Math.ceil((newElem.endDate.getTime() - newElem.startDate.getTime()) / (one_day)) + 1;
-                        siz = (newElem.endDate.getTime() - newElem.startDate.getTime()) / one_day + 1;
-                        newElem.size = siz;
-                    }
+						if (newElem.endDate === undefined) {
+							endDate = new Date(newElem.startDate.getTime());
+							endDate.setDate(newElem.startDate.getDate() + newElem.days - 1);
+							newElem.endDate = endDate;
+							siz = newElem.days;
+						} else {
+							//siz = Math.ceil((newElem.endDate.getTime() - newElem.startDate.getTime()) / (one_day)) + 1;
+							siz = (newElem.endDate.getTime() - newElem.startDate.getTime()) / one_day + 1;
+							newElem.size = siz;
+						}
 
-                    if(typ === 'month'){
-                        siz = this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(newElem.endDate.getTime()));
-                        newElem.size = siz;
-                    }
-                    else if(typ === 'year'){
-                        siz = (this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(newElem.endDate.getTime()))) / 12;
-                        newElem.size = siz;
-                    }
+						if(typ === 'month'){
+							siz = this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(newElem.endDate.getTime()));
+							newElem.size = siz;
+						}
+						else if(typ === 'year'){
+							siz = (this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(newElem.endDate.getTime()))) / 12;
+							newElem.size = siz;
+						}
 
-                    if(siz < 0.1){
-                        siz = 0.1;
-                    }
-                    newElem.size = siz;
+						if(siz < 0.1){
+							siz = 0.1;
+						}
+						newElem.size = siz;
 
-                    if (newElem.startDate.getTime() <= headerEnd.getTime() && newElem.endDate.getTime() >= headerStart.getTime()) {
-                        // Element belongs to working set  
-                        if(typ === 'date'){
-                            //diff = Math.ceil((newElem.startDate.getTime() - headerStart.getTime()) / (one_day));
-                            diff = (newElem.startDate.getTime() - headerStart.getTime()) / one_day; 
-                        }
-                        else if(typ === 'month'){
-                            diff = this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(headerStart.getTime()));
-                        }
-                        else if (typ === 'year'){
-                            diff = this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(headerStart.getTime()))/12;
-                        }
-                        
-                        newElemStart = diff * headerSpan;
-                        newElem.size *= headerSpan;
-                        newElemStop = newElemStart + newElem.size * this.options.unit_width.number - 1;
-                        newElem.start = newElemStart;
-                        newElem.end = newElemStop;
+						if (newElem.startDate.getTime() <= headerEnd.getTime() && newElem.endDate.getTime() >= headerStart.getTime()) {
+							// Element belongs to working set  
+							if(typ === 'date'){
+								//diff = Math.ceil((newElem.startDate.getTime() - headerStart.getTime()) / (one_day));
+								diff = (newElem.startDate.getTime() - headerStart.getTime()) / one_day; 
+							}
+							else if(typ === 'month'){
+								diff = this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(headerStart.getTime()));
+							}
+							else if (typ === 'year'){
+								diff = this._monthsDiff(new Date(newElem.startDate.getTime()),new Date(headerStart.getTime()))/12;
+							}
+							
+							newElemStart = diff * headerSpan; //units
+							newElem.size *= headerSpan;
+							newElemStop = newElemStart + newElem.size; //units
+							newElem.start = this.options.unit_width.number * newElemStart ; // pixels
+							newElem.end = this.options.unit_width.number * newElemStop; // pixels
 
-                        if(newElem.index === undefined){
-                            undefinedIndex = true;
-                        }
-                        else{
-                            newElem.row = this._getIndexRow(newElem.index);
-                            if(newElem.row === -1){
-                                undefinedIndex = true;
-                            }
-                        }
+							if(newElem.index === undefined){
+								undefinedIndex = true;
+							}
+							else{
+								newElem.row = this._getIndexRow(newElem.index);
+								if(newElem.row === -1){
+								    newElem.row = undefined;
+									undefinedIndex = true;
+								}
+							}
 
-                        wsElems.push(newElem);
-                    }
-                }
+							wsElems.push(newElem);
+						}
+					}
+					
+				}// if indexes not empty
+				
             }
             return { elems:wsElems, undefinedIndex:undefinedIndex};
         },

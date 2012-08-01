@@ -84,6 +84,10 @@ div.timeline_legend{
     opacity:0.7;
     background: #003366;
     border-radius : 4px;
+	color: white;
+    font-size: 14px;
+    font-style: italic;
+    text-align: center;
 }
 
 .timeline_legend_theme, .timeline_header_theme {
@@ -130,6 +134,10 @@ div.timeline_legend{
     opacity:0.7;
     background: #028482;
     border-radius : 4px;
+	color: white;
+    font-size: 14px;
+    font-style: italic;
+    text-align: center;
 }
 
 .timeline_legend_falconbouquet, .timeline_header_falconbouquet{
