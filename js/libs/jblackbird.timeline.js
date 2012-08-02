@@ -472,10 +472,11 @@
 
         _sortWSElements: function (elems, old, typ) {
 
-            var help, rowIndex, sorted, f, indexesToRemove, i, independent, samerow, t;
+            var help, rowIndex, sorted, f, indexesToRemove, i, independent, samerow, t, rowLegends, legendRows;
             help = $.extend([], elems);
             rowIndex = 1;
             sorted = [];
+			rowLegends = [];
 
             while (help.length > 0) {
 
@@ -486,6 +487,10 @@
                 help.splice(0, 1);
 				samerow = [];
                 for (i = 0; i < help.length; i += 1) {
+				
+					if(help[i].index !== undefined && $.inArray(help[i].index, rowLegends) === -1){
+						rowLegends.push(help[i].index);
+					}
 				
                     if (help[i].start >= f.end || help[i].end <= f.start) {
 					
@@ -520,17 +525,70 @@
             alert(y);*/
 
             if (old !== undefined && old.length !== 0) {
-                sorted = this._keepOldIndexes(sorted, old);
+                sorted = this._keepOldRows(sorted, old);
             }
 
             /*var x = "AFTER: ";
             for(var i=0; i<sorted.length; i++){ x += "id:"+sorted[i].id+"-index:"+sorted[i].row+" "; }
             alert(x);*/
+			
+			for(i = 0; i<rowLegends.length; i += 1){
+				legendRows = this._getDiffRows(this._getLegendElements(rowLegends[i], sorted));
+				if(legendRows.length >1){
+					sorted = this._organizeLegendRows(sorted,legendRows)
+				}
+			}
 
             return sorted;
         },
+		
+		_getDiffRows: function (elems){
+			var i, rows;
+			rows = [];
+			for(i=0; i<elems.length; i+=1){
+				if ($.inArray(elems[i].row, rows) === -1){
+					rows.push(elems[i].row);
+				}
+			}
+			rows.sort(function(a,b){
+				return a-b;
+			});
+			return rows;
+		},
+		
+		_getLegendElements: function (legend, elems){
+			var i, res;
+			res = [];
+			for(i=0; i<elems.length; i+=1){
+				if (elems[i].index === legend){
+					res.push(elems[i]);
+				}
+			}
+			return res;
+		},
+		
+		_organizeLegendRows: function (sorted, legRows){
+			var fstR, i, j, res;
+			fstR= legRows[0];
+			
+			/* Update again sorted elements' rows in order to have 
+			     all concurrent or semi-concurrent elements of the same legend
+			     in successive rows */
+			res = $.extend([], sorted);
+			for(j=1; j<legRows.length; j += 1){
+				for(i=0; i<res.length; i += 1){
+					if(res[i].row === legRows[j]){
+						res[i].row = fstR + j;
+					}
+					else if(res[i].row === (fstR + j) ){
+						res[i].row = legRows[j];
+					}	
+				}
+			}
+			return res;
+		},
 
-        _keepOldIndexes: function (sorted, old) {
+        _keepOldRows: function (sorted, old) {
 
             var res, j, i, old_ids;
             res = $.extend([], sorted);
@@ -541,14 +599,14 @@
             for (j = 0; j < old.length; j += 1) {
                 for (i = 0; i < res.length; i += 1) {
                     if (res[i].id === old[j].id && res[i].row !== old[j].row) {
-                        this._switchIndexes(res, res[i].id, res[i].row, old[j].row, old_ids);
+                        this._switchRows(res, res[i].id, res[i].row, old[j].row, old_ids);
                     }
                 }
             }
             return res;
         },
 
-        _switchIndexes: function (elems, elem_id, newIndex, oldIndex, old_ids) {
+        _switchRows: function (elems, elem_id, newIndex, oldIndex, old_ids) {
             var i;
             for (i = 0; i < elems.length; i += 1) {
                 if (elems[i].row === newIndex) {
@@ -628,7 +686,11 @@
                 //Working Set Elements to be loaded
                 wsElemsHash = this._getWSElements(headerStart, headerEnd, headerUnits, typ);
                 wsElems = wsElemsHash.elems;
-                if(wsElemsHash.undefinedIndex && wsElems.length >0 ){
+                
+				/* Sorting is always needed since multiple concurrent elements of
+				 the same index are allowed. New conditions inside _sortWSElements */
+				if(wsElemsHash.undefinedRow && wsElems.length >0 ){
+				//if(wsElems.length > 0 ){
                     wsElems = this._sortWSElements(wsElems, oldElems, typ);
                 }
                 this.options.ws_elements = $.extend([], wsElems);
@@ -692,9 +754,9 @@
 
         _getWSElements: function (headerStart, headerEnd, headerSpan, typ) { //alert( this._monthsDiff(new Date(2012,5,26),new Date(2012,6,2)));
 
-            var elems, wsElems, i, newElem, one_day, endDate, siz, diff, newElemStart, newElemStop, one_sec, one_min, one_hour, one_month, one_year, undefinedIndex;
+            var elems, wsElems, i, newElem, one_day, endDate, siz, diff, newElemStart, newElemStop, one_sec, one_min, one_hour, one_month, one_year, undefinedRow;
             elems = this.options.elements;
-            undefinedIndex = false;
+            undefinedRow = false;
             wsElems = [];
             for (i = 0; i < elems.length; i += 1) {
                 newElem = $.extend({}, elems[i]);
@@ -754,25 +816,86 @@
 							newElem.end = this.options.unit_width.number * newElemStop; // pixels
 
 							if(newElem.index === undefined){
-								undefinedIndex = true;
+								undefinedRow = true;
 							}
 							else{
 								newElem.row = this._getIndexRow(newElem.index);
 								if(newElem.row === -1){
 								    newElem.row = undefined;
-									undefinedIndex = true;
+									undefinedRow = true;
 								}
 							}
-
+							
 							wsElems.push(newElem);
 						}
 					}
-					
+						
 				}// if indexes not empty
 				
             }
-            return { elems:wsElems, undefinedIndex:undefinedIndex};
+			
+			if(wsElems.length > 1){
+				wsElems = this._organizeSameRowElements($.extend([],wsElems));
+			}
+
+            return { elems:wsElems, undefinedRow:undefinedRow};
         },
+		
+		_organizeSameRowElements: function(wsElems){
+			var legendElems, i, help, rowIndex, sorted, f, t, j, k, legendRows, indexesToRemove, samerow, independent;
+			
+			for(i = 0; i<this.options.indexes.length; i += 1){
+				legendElems = this._getLegendElements(this.options.indexes[i], wsElems);
+				if(legendElems.length > 1){
+					help = $.extend([],legendElems);
+					rowIndex = help[0].row;
+					sorted = [];
+					while (help.length > 0) {
+						f = help[0];
+						f.row = rowIndex;
+						indexesToRemove = [];
+						sorted.push(f);
+						help.splice(0, 1);
+						samerow = [];
+						for (j = 0; j < help.length; j += 1) {
+							if (help[j].start >= f.end || help[j].end <= f.start) {
+								independent = true;
+								for(t =0; t < samerow.length; t += 1){
+									if ( (samerow[t].start < help[j].start  && help[j].start< samerow[t].end) || (samerow[t].start < help[j].end &&  help[j].end < samerow[t].end) ) {
+										independent = false;
+										break;
+									}
+								}
+								if(independent){
+									help[j].row = rowIndex;
+									indexesToRemove.push(j);
+									sorted.push(help[j]);
+									samerow.push(help[j]);
+								}
+							}
+						}
+						for (j = 0; j < indexesToRemove.length; j += 1) { 
+							help.splice(indexesToRemove[j] - j, 1); // Every time one element is removed the next indexes must be decreased by 1
+						}
+						rowIndex += 1;
+					}
+
+					legendRows = this._getDiffRows(sorted);
+					if(legendRows.length >1){
+						for(j=1; j<legendRows.length; j+=1){
+							for(k=0; k<wsElems.length; k+=1){
+								if($.inArray(wsElems[k], sorted) === -1){
+									if( wsElems[k].row >= legendRows[j] ){
+										wsElems[k].row += legendRows.length -1;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return wsElems;
+		},
 
         _getIndexRow: function(ind){
             var r;
@@ -1010,10 +1133,11 @@
         },
 
         _setLegends: function (ws_height) {
-            var rows, elems, css, j, row_elems, elems_label, paddingLeft, paddingRight, paddingTop, paddingBottom, style_class, style_text;
+            var rows, elems, css, j, row_elems, elems_label, rowsSpan, paddingLeft, paddingRight, paddingTop, paddingBottom, style_class, style_text, pTop, pBottom, nTopNum, nBotNum, legndRows, rowCount, newLeg;
             rows = Math.round(ws_height / this.options.row_height.number);
             elems = this.options.ws_elements;
-
+			rowsSpan = 0;
+			
             for (j = 0; j < rows; j += 1) {
 
                 row_elems = this._getRowElements(elems, j);
@@ -1021,11 +1145,10 @@
                 //this._trigger('legendStyleText',null, row_elems);
                 style_text = this.options.legendStyleText(row_elems);
 
-                //elems_label = (row_elems.length!==0)? (row_elems.length + ((row_elems.length === 1) ? " element" : " elements") ) : "";
                 elems_label = (row_elems.length!==0)? row_elems[0].index : "";
                 if(this.options.indexes.length !== 0) {
-					if(j>0 && j<=this.options.indexes.length){
-						elems_label = this.options.indexes[j-1];
+					if(j>0 && j <= (this.options.indexes.length + rowsSpan) ){
+						elems_label = this.options.indexes[j - 1 - rowsSpan];
 					}
                 }
                 
@@ -1040,43 +1163,69 @@
                 }
 
                 if (row_elems.length === 0 || j === 0) {
-                    $('<div></div>').appendTo(".timeline_legend").css({
-                        'top': j * this.options.row_height.number + this.options.row_height.unit,
+                    newLeg = $('<div></div>').appendTo(".timeline_legend").css({
+                        'top': j  * this.options.row_height.number + this.options.row_height.unit,
                         'left': '0px'
                     })
                     //.css(css)
                     .text(elems_label)
                     .addClass(style_class);
+					
+					if(j === 0){
+						paddingLeft = this._getSizeHash($('.timeline_legend div').first().css('padding-left')).number;
+						paddingRight = this._getSizeHash($('.timeline_legend div').first().css('padding-right')).number;
+						paddingTop = this._getSizeHash($('.timeline_legend div').first().css('padding-top')).number;
+						paddingBottom = this._getSizeHash($('.timeline_legend div').first().css('padding-bottom')).number;
+					}
+					
+					//$(' .timeline_legend div').css({
+					newLeg.css({
+						'width': this.options.legend_width.number - paddingLeft - paddingRight + this.options.legend_width.unit,
+						'height': this.options.row_height.number - paddingTop - paddingBottom - 1 + this.options.row_height.unit
+					});
+						
                 } else {
-                    /*var elems_label = "";
-                    for(var k=0; k<row_elems.length; k += 1){ 
-                        elems_label += row_elems[k].label +" " ;
-                    }*/
-                    
-                    $('<div></div>').appendTo(".timeline_legend").css({
+
+                    newLeg = $('<div></div>').appendTo(".timeline_legend").css({
                         'top': j * this.options.row_height.number + this.options.row_height.unit,
-                        'left': '0px'//,
-                        //'border-top': '1px solid'
+                        'left': '0px'   
                     })
-                    //.css(css)
-                    .addClass(style_class)
+                    .css({
+							'width': this.options.legend_width.number - paddingLeft - paddingRight + this.options.legend_width.unit,
+							'height': this.options.row_height.number - paddingTop - paddingBottom - 1 + this.options.row_height.unit
+						}).addClass(style_class)
                     .text(elems_label)
                     ._timeline_legend({ 
                         row_elems: $.extend([], row_elems), 
                         legendClicked: this.options.legendClicked,
                         legendDBLClicked: this.options.legendDBLClicked });
+					
+					if(row_elems[0].index !== undefined && $.trim(row_elems[0].index) !== ''){					
+						legndRows = this._getDiffRows(this._getLegendElements(row_elems[0].index, elems));
+						rowCount = legndRows.length;
+						if(rowCount > 1){
+						
+							/* Change the div that contains the multiple rows legend 
+								in order to contain them and skip rowCount -1 next legends 
+								that would just be repeats of the current one */
+							pTop = this._getSizeHash(newLeg.css('padding-top'));
+							pBottom = this._getSizeHash(newLeg.css('padding-bottom'));
+							nTopNum = rowCount * pTop.number;
+							nBotNum = rowCount * pBottom.number;
+							newLeg.css({
+								'padding-top': nTopNum + pTop.unit,
+								'padding-bottom': nBotNum + pBottom.unit,
+								'height': (rowCount * this.options.row_height.number) - nTopNum - nBotNum - 1 + this.options.row_height.unit
+							});
+							j += (rowCount -1);
+							rowsSpan += (rowCount -1);
+							
+						}
+					}
 
                 }
 
-
-                paddingLeft = this._getSizeHash($('.timeline_legend div').css('padding-left')).number;
-                paddingRight = this._getSizeHash($('.timeline_legend div').css('padding-right')).number;
-                paddingTop = this._getSizeHash($('.timeline_legend div').css('padding-top')).number;
-                paddingBottom = this._getSizeHash($('.timeline_legend div').css('padding-bottom')).number;
-                $(' .timeline_legend div').css({
-                    'width': this.options.legend_width.number - paddingLeft - paddingRight + this.options.legend_width.unit,
-                    'height': this.options.row_height.number - paddingTop - paddingBottom - 1 + this.options.row_height.unit
-                });
+                
 
             }
         },

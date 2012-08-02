@@ -118,7 +118,7 @@ $(document).ready(function(){
         legendClicked: showLegendInfo,
         legendDBLClicked: showLegendInfo,
 		//indexes:['CarA','CarB'],
-        //indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI'], 
+        indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI'], 
         //headerStyleText: defineHeaderStyle,
         //elementBind: elementDBL,
         //timelineImg: setImgStyleAltSize,
@@ -130,15 +130,30 @@ $(document).ready(function(){
             id: 1,
             startDate: new Date(2012, 5, 26),
             days: 7,
-            index: 'CarA',
+           index: 'CarA',
             label: "Reserv A"
         }, {
             id: 7,
-            startDate: new Date(2012, 5, 26),
+           startDate: new Date(2012, 5, 26),
             days: 7,
             index: 'CarA',
             label: "Reserv G"
         }, {
+            id: 8,
+           startDate: new Date(2012, 6, 5),
+            days: 2,
+            index: 'CarA',
+            label: "Reserv H"
+        }, {
+            id: 9,
+            startDate: new Date(2012, 6, 4),
+            days: 2,
+            index: 'CarA',
+            label: "Reserv I"
+        },
+		
+		
+		{
             id: 2,
             startDate: new Date(2012, 5, 28),
             days: 4,
