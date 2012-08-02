@@ -1,8 +1,9 @@
 $(document).ready(function(){
 	
+	var contain = $("<div></div>").css({ 'width':'100%', 'height':'90%' }).appendTo("body");
     var bar = $("<div></div>").css({
         'overflow': 'visible'
-    }).appendTo("body");
+    }).appendTo(contain);
 
 
     
@@ -10,7 +11,7 @@ $(document).ready(function(){
     bar.timeline( { 
 	width:'100%',
 	height:'100%',
-	indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI']
+	indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI','CarJ', 'CarK', 'CarL', 'CarM', 'CarN', 'CarO', 'CarP']
 	
 	} );
 		

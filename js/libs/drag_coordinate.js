@@ -99,10 +99,10 @@
                 this.bind("drag", function (event, ui) {
 
                     leaderOffsetX = parseFloat(
-                        $(event.target).position().left
+                        $(ui.helper[0]).position().left
                     );
                     leaderOffsetY = parseFloat(
-                        $(event.target).position().top
+                        $(ui.helper[0]).position().top
                     );
                     $.each(elementsboth, function (j, elem) {
                         elem.css({
@@ -126,30 +126,32 @@
                 });
 
                 this.bind("dragstop", function (event, ui) {
-                    leaderOffsetX = parseFloat(
-                        $(event.target).position().left
-                    );
-                    leaderOffsetY = parseFloat(
-                        $(event.target).position().top
-                    );
-                    $.each(elementsboth, function (j, elem) {
-                        elem.css({
-                            'left': leaderOffsetX,
-                            'top': leaderOffsetY
+                    
+                        leaderOffsetX = parseFloat(
+                            $(ui.helper[0]).position().left
+                        );
+                        leaderOffsetY = parseFloat(
+                            $(ui.helper[0]).position().top
+                        );
+                        $.each(elementsboth, function (j, elem) {
+                            elem.css({
+                                'left': leaderOffsetX,
+                                'top': leaderOffsetY
+                            });
                         });
-                    });
 
-                    $.each(elementsx, function (j, elem) {
-                        elem.css({
-                            'left': leaderOffsetX
+                        $.each(elementsx, function (j, elem) {
+                            elem.css({
+                                'left': leaderOffsetX
+                            });
                         });
-                    });
 
-                    $.each(elementsy, function (j, elem) {
-                        elem.css({
-                            'top': leaderOffsetY
+                        $.each(elementsy, function (j, elem) {
+                            elem.css({
+                                'top': leaderOffsetY
+                            });
                         });
-                    });
+
                 });
             }
         },

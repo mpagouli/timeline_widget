@@ -133,6 +133,12 @@ $(document).ready(function(){
             index: 'CarA',
             label: "Reserv A"
         }, {
+            id: 7,
+            startDate: new Date(2012, 5, 26),
+            days: 7,
+            index: 'CarA',
+            label: "Reserv G"
+        }, {
             id: 2,
             startDate: new Date(2012, 5, 28),
             days: 4,

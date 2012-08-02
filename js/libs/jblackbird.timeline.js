@@ -238,7 +238,7 @@
             if (isDraggable) {
                 this.element.bind("dragstop", function (event, ui) {
 
-                    dragged = $(event.target);
+                    dragged = $(ui.helper[0]);
                     father = dragged.parent();
 
                     fatherStartX = parseFloat(father.position().left);
