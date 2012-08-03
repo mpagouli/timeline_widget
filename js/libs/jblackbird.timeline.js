@@ -14,9 +14,10 @@
             endDate: undefined,
             size: undefined,
             days: undefined,
-            label: undefined,
+            html: undefined,
             index: undefined,
             row: undefined,
+			helper: undefined,
             elementClicked: function(){},
             elementDBLClicked: function(){}//,
             //elementBind: function(){}
@@ -193,8 +194,8 @@
                 'left': time_element.start + 'px',
                 'top': time_element.row * this.options.row_height.number + 'px'
             });
-			if(time_element.label !== undefined && time_element.label !== ''){
-				newElement.html(time_element.label);
+			if(time_element.html !== undefined && time_element.html !== ''){
+				newElement.html(time_element.html);
 			}
 
             time_element.elementClicked = this.options.elementClicked;
@@ -777,8 +778,8 @@
 							newElem.endDate = endDate;
 							siz = newElem.days;
 						} else {
-							//siz = Math.ceil((newElem.endDate.getTime() - newElem.startDate.getTime()) / (one_day)) + 1;
-							siz = (newElem.endDate.getTime() - newElem.startDate.getTime()) / one_day + 1;
+							//siz = (newElem.endDate.getTime() - newElem.startDate.getTime()) / one_day + 1;
+							siz = (newElem.endDate.getTime() - newElem.startDate.getTime()) / one_day;
 							newElem.size = siz;
 						}
 
@@ -1112,7 +1113,7 @@
             });
 
             /*$(".ws_container").bind('time_element_clicked', function(event, elem){
-                //alert(elem.label);
+                //alert(elem.html);
             });*/
         },
 

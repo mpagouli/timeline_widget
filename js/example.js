@@ -30,17 +30,17 @@ $(document).ready(function(){
         .html('<p>Start Date: '+elem.startDate.format('d/m/yyyy')+'</br>End Date: '+ elem.endDate.format('d/m/yyyy') +'</p>')
         .dialog({
             autoOpen: false,
-            title: elem.label,
+            title: elem.html,
             position: "center"
         });
         dialog.dialog('open'); 
     };
 
     var showLegendInfo = function(elems){
-       var elems_str = elems[0].label;
+       var elems_str = elems[0].html;
         for(var i=1; i<elems.length; i++){
             if(i === 1) { elems_str += ', ';}
-            elems_str += elems[i].label
+            elems_str += elems[i].html
         }
         var dialog = $('<div></div>')
         .addClass("ui-widget ui-widget-content ui-corner-all")
@@ -88,7 +88,7 @@ $(document).ready(function(){
             .html('<p>Start Date: '+elem.startDate.format('d/m/yyyy')+'</br>End Date: '+ elem.endDate.format('d/m/yyyy') +'</p>')
             .dialog({
                 autoOpen: false,
-                title: elem.label,
+                title: elem.html,
                 position: "center"
             });
             dialog.dialog('open'); 
@@ -118,7 +118,7 @@ $(document).ready(function(){
         legendClicked: showLegendInfo,
         legendDBLClicked: showLegendInfo,
 		//indexes:['CarA','CarB'],
-        indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI'], 
+        //indexes:['CarA', 'CarB', 'CarC', 'CarD', 'CarE', 'CarF', 'CarG', 'CarH', 'CarI'], 
         //headerStyleText: defineHeaderStyle,
         //elementBind: elementDBL,
         //timelineImg: setImgStyleAltSize,
@@ -128,62 +128,62 @@ $(document).ready(function(){
         //legendsZIndex:10000,
         elements: [{
             id: 1,
-            startDate: new Date(2012, 5, 26),
+            startDate: new Date(2012, 5, 26, 12, 00, 00, 00),
             days: 7,
            index: 'CarA',
-            label: "Reserv A"
+            html: "Reserv A"
         }, {
             id: 7,
-           startDate: new Date(2012, 5, 26),
+           startDate: new Date(2012, 5, 26, 12, 00, 00, 00),
             days: 7,
             index: 'CarA',
-            label: "Reserv G"
+            html: "Reserv G"
         }, {
             id: 8,
-           startDate: new Date(2012, 6, 5),
+           startDate: new Date(2012, 6, 5, 12, 00, 00, 00),
             days: 2,
             index: 'CarA',
-            label: "Reserv H"
+            html: "Reserv H"
         }, {
             id: 9,
-            startDate: new Date(2012, 6, 4),
+            startDate: new Date(2012, 6, 4, 12, 00, 00, 00),
             days: 2,
             index: 'CarA',
-            label: "Reserv I"
+            html: "Reserv I"
         },
 		
 		
 		{
             id: 2,
-            startDate: new Date(2012, 5, 28),
+            startDate: new Date(2012, 5, 28, 12, 00, 00, 00),
             days: 4,
             index: 'CarB',
-            label: "Reserv B"
+            html: "Reserv B"
         }, {
             id: 3, 
-            startDate: new Date(2012, 5, 20),
+            startDate: new Date(2012, 5, 20, 12, 00, 00, 00),
             days: 17,
             index: 'CarC',
-            label: "Reserv C"
+            html: "Reserv C"
         }, {
             id: 4,
-            startDate: new Date(2012, 5, 2),
-            endDate: new Date(2012, 5, 22),
+            startDate: new Date(2012, 5, 2, 12, 00, 00, 00),
+            endDate: new Date(2012, 5, 22, 13, 00, 00, 00),
             //days: 21,
             index: 'CarB',
-            label: "Reserv D"
+            html: "Reserv D"
         }, {
             id: 5,
-            startDate: new Date(2012, 5, 1),
+            startDate: new Date(2012, 5, 1, 12, 00, 00, 00),
             days: 10,
             index: 'CarD',
-            label: "Reserv E"
+            html: "Reserv E"
         }, {
             id: 6,
-            startDate: new Date(2012, 6, 10),
+            startDate: new Date(2012, 6, 10, 12, 00, 00, 00),
             days: 5,
             index: 'CarE',
-            label: "Reserv F"
+            html: "Reserv F"
         }]
     });
 

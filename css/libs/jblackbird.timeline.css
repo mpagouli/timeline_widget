@@ -88,6 +88,9 @@ div.timeline_legend{
     font-size: 14px;
     font-style: italic;
     text-align: center;
+	box-sizing:border-box;
+    -moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
 }
 
 .timeline_legend_theme, .timeline_header_theme {
